@@ -767,7 +767,8 @@ PlayerSettings:
   webGLWebAssemblyBigInt: 0
   webGLCloseOnQuit: 0
   webWasm2023: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Standalone: MORPEH_BURST;MORPEH
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
