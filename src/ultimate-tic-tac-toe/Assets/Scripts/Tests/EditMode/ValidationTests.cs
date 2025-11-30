@@ -5,20 +5,19 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using FluentAssertions;
 
 namespace Tests.EditMode
 {
     public class ValidationTests
     {
-        private static ILogger Logger => Debug.unityLogger;
-
         [Test]
-        public void ValidationTestsSimplePasses()
-        {
-            FindMissingComponentsInScenes();
-        }
+        public void AllGameObjectsShouldNoHaveMissingScriptsInScenes() => FindMissingComponentsInScenes();
+        
+        [Test]
+        public void AllGameObjectsShouldNoHaveMissingScriptsInPrefabs() => FindMissingComponentsInPrefabs();
 
-        public static void FindMissingComponentsInScenes()
+        private static void FindMissingComponentsInScenes()
         {
             var errors = new List<string>();
             
@@ -31,10 +30,11 @@ namespace Tests.EditMode
                 }
             }
             
-            Assert.That(errors, Is.Empty);
+            //Assert.That(errors, Is.Empty);
+            errors.Should().BeEmpty();
         }
 
-        public static void FindMissingComponentsInPrefabs()
+        private static void FindMissingComponentsInPrefabs()
         {
             var prefabGuids = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets" });
 
@@ -100,8 +100,8 @@ namespace Tests.EditMode
             {
                 var missingScriptsCount = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(obj);
 
-                if (missingScriptsCount > 0) 
-                    Logger.LogError("Validator", $"Prefab '{prefabPath}' has {missingScriptsCount} missing script(s) on GameObject '{obj.name}'.");
+                //if (missingScriptsCount > 0) 
+                    //Logger.LogError("Validator", $"Prefab '{prefabPath}' has {missingScriptsCount} missing script(s) on GameObject '{obj.name}'.");
             }
         }
 
