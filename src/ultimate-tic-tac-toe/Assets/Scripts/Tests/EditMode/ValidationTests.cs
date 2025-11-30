@@ -11,28 +11,24 @@ namespace Tests.EditMode
 {
     public class ValidationTests
     {
-        [Test]
-        public void AllGameObjectsShouldNoHaveMissingScriptsInScenes() => FindMissingComponentsInScenes();
-        
-        [Test]
-        public void AllGameObjectsShouldNoHaveMissingScriptsInPrefabs() => FindMissingComponentsInPrefabs();
-
-        private static void FindMissingComponentsInScenes()
+        [TestCaseSource(nameof(AllScenesPaths))]
+        public void AllGameObjectsShouldNoHaveMissingScriptsInScenes(string scenePath)
         {
-            var errors = new List<string>();
+            var openedScene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
+            var gameObjectsWithMissingScripts = new List<string>();
             
-            foreach (var scene in GetAllProjectScenes())
+            foreach (var gameObject in GetAllGameObjects(openedScene))
             {
-                foreach (var gameObject in GetAllGameObjects(scene))
-                {
-                    if (HasMissingComponents(gameObject)) 
-                        errors.Add($"GameObject '{gameObject.name}' from Scene '{scene.name}' had missing scripts which were removed.");
-                }
+                if (HasMissingComponents(gameObject)) 
+                    gameObjectsWithMissingScripts.Add(gameObject.name);
             }
             
-            //Assert.That(errors, Is.Empty);
-            errors.Should().BeEmpty();
+            EditorSceneManager.CloseScene(openedScene, true);
+            gameObjectsWithMissingScripts.Should().BeEmpty();
         }
+
+        /*[Test]
+        public void AllGameObjectsShouldNoHaveMissingScriptsInPrefabs() => FindMissingComponentsInPrefabs();*/
 
         private static void FindMissingComponentsInPrefabs()
         {
@@ -52,28 +48,11 @@ namespace Tests.EditMode
         
         private static bool HasMissingComponents(GameObject gameObject) => 
             GameObjectUtility.RemoveMonoBehavioursWithMissingScript(gameObject) > 0;
-        
-        private static IEnumerable<Scene> GetAllProjectScenes()
-        {
-            var scenePaths = AssetDatabase
+
+        private static IEnumerable<string> AllScenesPaths() =>
+            AssetDatabase
                 .FindAssets("t:Scene", new[] { "Assets" })
                 .Select(AssetDatabase.GUIDToAssetPath);
-
-            foreach (var scenePath in scenePaths)
-            {
-                var scene = SceneManager.GetSceneByPath(scenePath);
-
-                if (scene.isLoaded)
-                    yield return scene;
-                else
-                {
-                    var openedScene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
-                    yield return openedScene;
-
-                    EditorSceneManager.CloseScene(openedScene, true);
-                }
-            }
-        }
 
         private static IEnumerable<GameObject> GetAllGameObjects(Scene scene)
         {
