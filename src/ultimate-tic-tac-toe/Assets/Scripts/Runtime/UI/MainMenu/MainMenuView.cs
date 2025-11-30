@@ -7,11 +7,11 @@ namespace Runtime.UI.MainMenu
 {
     public class MainMenuView : UIView<MainMenuViewModel>
     {
-        [global::Runtime.UI.Core.UxmlElementAttribute("Title")] 
+        [Core.UxmlElementAttribute("Title")] 
         private Label _titleLabel;
-        [global::Runtime.UI.Core.UxmlElementAttribute("StartButton")] 
+        [Core.UxmlElementAttribute("StartButton")] 
         private Button _startButton;
-        [global::Runtime.UI.Core.UxmlElementAttribute("ExitButton")] 
+        [Core.UxmlElementAttribute("ExitButton")] 
         private Button _exitButton;
 
         protected override void BindViewModel()

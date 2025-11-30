@@ -12,7 +12,7 @@ namespace Tests.EditMode
     public class ValidationTests
     {
         [TestCaseSource(nameof(AllScenesPaths))]
-        public void AllGameObjectsShouldNoHaveMissingScriptsInScenes(string scenePath)
+        public void AllGameObjectsShouldNotHaveMissingScriptsInScenes(string scenePath)
         {
             var openedScene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
             var gameObjectsWithMissingScripts = new List<string>();
@@ -24,34 +24,38 @@ namespace Tests.EditMode
             }
             
             EditorSceneManager.CloseScene(openedScene, true);
+            
             gameObjectsWithMissingScripts.Should().BeEmpty();
         }
 
-        /*[Test]
-        public void AllGameObjectsShouldNoHaveMissingScriptsInPrefabs() => FindMissingComponentsInPrefabs();*/
-
-        private static void FindMissingComponentsInPrefabs()
+        [TestCaseSource(nameof(AllPrefabPaths))]
+        public void AllGameObjectsShouldNotHaveMissingScriptsInPrefabs(string prefabPath)
         {
-            var prefabGuids = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets" });
-
-            foreach (var guid in prefabGuids)
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            prefab.Should().NotBeNull($"Failed to load prefab at '{prefabPath}'");
+            
+            var gameObjectsWithMissingScripts = new List<string>();
+            
+            foreach (var gameObject in GetAllGameObjects(prefab))
             {
-                var prefabPath = AssetDatabase.GUIDToAssetPath(guid);
-                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-
-                if (prefab == null)
-                    continue;
-
-                CheckPrefabForMissingComponents(prefab, prefabPath);
+                if (HasMissingComponents(gameObject))
+                    gameObjectsWithMissingScripts.Add(gameObject.name);
             }
+            
+            gameObjectsWithMissingScripts.Should().BeEmpty(prefab.name);
         }
         
         private static bool HasMissingComponents(GameObject gameObject) => 
-            GameObjectUtility.RemoveMonoBehavioursWithMissingScript(gameObject) > 0;
+            GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(gameObject) > 0;
 
         private static IEnumerable<string> AllScenesPaths() =>
             AssetDatabase
                 .FindAssets("t:Scene", new[] { "Assets" })
+                .Select(AssetDatabase.GUIDToAssetPath);
+
+        private static IEnumerable<string> AllPrefabPaths() =>
+            AssetDatabase
+                .FindAssets("t:Prefab", new[] { "Assets" })
                 .Select(AssetDatabase.GUIDToAssetPath);
 
         private static IEnumerable<GameObject> GetAllGameObjects(Scene scene)
@@ -69,27 +73,21 @@ namespace Tests.EditMode
                 }
             }
         }
-        
-        private static void CheckPrefabForMissingComponents(GameObject prefab, string prefabPath)
+
+        private static IEnumerable<GameObject> GetAllGameObjects(GameObject rootGameObject)
         {
-            var allObjects = new List<GameObject> { prefab };
-            GetAllChildrenRecursive(prefab.transform, allObjects);
+            var gameObjectsQueue = new Queue<GameObject>();
+            gameObjectsQueue.Enqueue(rootGameObject);
 
-            foreach (var obj in allObjects)
+            while (gameObjectsQueue.Count > 0)
             {
-                var missingScriptsCount = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(obj);
+                var gameObject = gameObjectsQueue.Dequeue();
+                yield return gameObject;
 
-                //if (missingScriptsCount > 0) 
-                    //Logger.LogError("Validator", $"Prefab '{prefabPath}' has {missingScriptsCount} missing script(s) on GameObject '{obj.name}'.");
-            }
-        }
-
-        private static void GetAllChildrenRecursive(Transform parent, List<GameObject> result)
-        {
-            foreach (Transform child in parent)
-            {
-                result.Add(child.gameObject);
-                GetAllChildrenRecursive(child, result);
+                foreach (Transform child in gameObject.transform)
+                {
+                    gameObjectsQueue.Enqueue(child.gameObject);
+                }
             }
         }
     }
