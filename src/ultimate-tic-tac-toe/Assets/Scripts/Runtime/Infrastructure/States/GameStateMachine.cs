@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-
 namespace Runtime.Infrastructure.States
 {
     public class GameStateMachine : IGameStateMachine
     {
         private readonly IStateFactory _stateFactory;
-        private readonly Dictionary<Type, IExitableState> _states = new();
 
         public IExitableState CurrentState { get; private set; }
 
@@ -27,19 +23,9 @@ namespace Runtime.Infrastructure.States
         private TState ChangeState<TState>() where TState : class, IExitableState
         {
             CurrentState?.Exit();
-            var state = GetState<TState>();
+            var state = _stateFactory.CreateState<TState>();
             CurrentState = state;
             return state;
-        }
-
-        private TState GetState<TState>() where TState : class, IExitableState
-        {
-            var stateType = typeof(TState);
-            
-            if (!_states.ContainsKey(stateType)) 
-                _states[stateType] = _stateFactory.CreateState<TState>();
-
-            return _states[stateType] as TState;
         }
     }
 }
