@@ -56,6 +56,7 @@ namespace Runtime.UI.Core
         public virtual void ResetForPool()
         {
             Hide();
+            ClearViewModel();
             OnResetForPool();
         }
 

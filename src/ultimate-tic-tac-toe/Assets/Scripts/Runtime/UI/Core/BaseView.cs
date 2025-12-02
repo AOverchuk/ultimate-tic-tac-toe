@@ -18,9 +18,13 @@ namespace Runtime.UI.Core
         public void SetViewModel(TViewModel viewModel)
         {
             ViewModel = viewModel;
-            
-            if (Root != null && !_isInitialized) 
-                InitializeViewModel();
+            TryInitializeViewModel();
+        }
+
+        public void ClearViewModel()
+        {
+            ViewModel = null;
+            _isInitialized = false;
         }
 
         protected virtual void Awake()
@@ -28,14 +32,12 @@ namespace Runtime.UI.Core
             _uiDocument = GetComponent<UIDocument>();
             Root = _uiDocument.rootVisualElement;
             UxmlBinder.BindElements(this, Root);
-            
-            if (ViewModel != null && !_isInitialized) 
-                InitializeViewModel();
+            TryInitializeViewModel();
         }
 
-        private void InitializeViewModel()
+        private void TryInitializeViewModel()
         {
-            if (_isInitialized)
+            if (_isInitialized || ViewModel == null || Root == null)
                 return;
 
             _isInitialized = true;
@@ -70,7 +72,6 @@ namespace Runtime.UI.Core
         protected virtual void OnDestroy()
         {
             _disposables.Dispose();
-            ViewModel?.Dispose();
         }
     }
 }

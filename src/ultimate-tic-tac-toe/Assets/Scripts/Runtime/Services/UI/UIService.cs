@@ -167,11 +167,11 @@ namespace Runtime.Services.UI
                 subscription?.Dispose();
             
             var viewModel = GetViewModelFromWindow(window);
+            _poolManager.ReturnWindowToPool(window);
             
             if (viewModel != null)
                 _poolManager.ReturnViewModelToPool(viewModel);
             
-            _poolManager.ReturnWindowToPool(window);
             return true;
         }
 
