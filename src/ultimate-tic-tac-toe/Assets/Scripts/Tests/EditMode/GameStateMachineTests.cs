@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
 using Runtime.Infrastructure.States;
@@ -204,6 +205,22 @@ namespace Tests.EditMode
             });
             
             payloadState.Received(1).Enter(42);
+        }
+
+        [Test]
+        public void WhenEnterStateWithPayloadWithNull_ThenHandlesCorrectly()
+        {
+            // Arrange
+            var payloadState = Substitute.For<IPayloadedState<string>>();
+            _stateFactory.CreateState<IPayloadedState<string>>().Returns(payloadState);
+            var stateMachine = new GameStateMachine(_stateFactory);
+
+            // Act
+            Action act = () => stateMachine.Enter<IPayloadedState<string>, string>(null);
+
+            // Assert
+            act.Should().NotThrow();
+            payloadState.Received(1).Enter(null);
         }
     }
 }
