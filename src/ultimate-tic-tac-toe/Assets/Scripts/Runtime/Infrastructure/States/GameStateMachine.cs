@@ -29,4 +29,3 @@ namespace Runtime.Infrastructure.States
         }
     }
 }
-
