@@ -98,5 +98,25 @@ namespace Tests.EditMode
                 state2.Enter();
             });
         }
+
+        [Test]
+        public void WhenEnterSameStateType_ThenCreatesNewInstance()
+        {
+            // Arrange
+            var firstStateInstance = Substitute.For<IState>();
+            var secondStateInstance = Substitute.For<IState>();
+            _stateFactory.CreateState<IState>().Returns(firstStateInstance, secondStateInstance);
+            var stateMachine = new GameStateMachine(_stateFactory);
+            stateMachine.Enter<IState>();
+
+            // Act
+            stateMachine.Enter<IState>();
+
+            // Assert
+            firstStateInstance.Received(1).Exit();
+            _stateFactory.Received(2).CreateState<IState>();
+            stateMachine.CurrentState.Should().NotBe(firstStateInstance);
+            stateMachine.CurrentState.Should().Be(secondStateInstance);
+        }
     }
 }
