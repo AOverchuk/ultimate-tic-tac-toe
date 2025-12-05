@@ -14,10 +14,10 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "FluentAssertions.dll",
         "Castle.Core.dll",
-        "System.Diagnostics.EventLog.dll",
-        "NSubstitute.dll"
+        "FluentAssertions.dll",
+        "NSubstitute.dll",
+        "System.Diagnostics.EventLog.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
