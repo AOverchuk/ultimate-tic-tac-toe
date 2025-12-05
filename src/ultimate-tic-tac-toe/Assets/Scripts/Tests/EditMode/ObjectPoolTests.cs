@@ -65,6 +65,34 @@ namespace Tests.EditMode
 
         #endregion
 
+        #region Callback Tests
+
+        [Test]
+        public void WhenReturnWithCallbacks_ThenInvokedCorrectly()
+        {
+            // Arrange
+            var item1 = new TestClass();
+            var item2 = new TestClass();
+            var onReturnCallCount = 0;
+            var onClearCallCount = 0;
+
+            // Act - Return with callback
+            _pool.Return(item1, _ => onReturnCallCount++);
+            _pool.Return(item2, _ => onReturnCallCount++);
+
+            // Assert - onReturn callback invoked twice
+            onReturnCallCount.Should().Be(2);
+
+            // Act - Clear with callback
+            _pool.Clear(typeof(TestClass), _ => onClearCallCount++);
+
+            // Assert - onClear callback invoked twice (once per item)
+            onClearCallCount.Should().Be(2);
+            _pool.GetSize(typeof(TestClass)).Should().Be(0);
+        }
+
+        #endregion
+
         #region Test Classes
 
         private class TestClass { }
