@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using NUnit.Framework;
 using Runtime.Services.UI;
 
@@ -89,6 +90,24 @@ namespace Tests.EditMode
             // Assert - onClear callback invoked twice (once per item)
             onClearCallCount.Should().Be(2);
             _pool.GetSize(typeof(TestClass)).Should().Be(0);
+        }
+
+        #endregion
+
+        #region Return Null Validation Tests
+
+        [Test]
+        public void WhenReturnWithNullTypeAndItem_ThenThrowsException()
+        {
+            // Arrange
+            // Pool готов
+
+            // Act
+            Action act = () => _pool.Return(null, null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>()
+                .WithMessage("*type*");
         }
 
         #endregion
