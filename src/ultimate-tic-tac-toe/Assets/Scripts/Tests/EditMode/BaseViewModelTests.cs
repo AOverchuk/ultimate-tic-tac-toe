@@ -50,6 +50,19 @@ namespace Tests.EditMode
             disposable3.DisposeCallCount.Should().Be(1, oldDisposablesShouldNotBeDisposedAgain);
         }
 
+        [Test]
+        public void WhenResetCalled_ThenOnResetIsInvoked()
+        {
+            // Arrange
+            _viewModel.WasOnResetCalled.Should().BeFalse("initially OnReset should not be called");
+
+            // Act
+            _viewModel.Reset();
+
+            // Assert
+            _viewModel.WasOnResetCalled.Should().BeTrue("OnReset hook should be invoked during Reset");
+        }
+
         #endregion
 
         #region Test Helpers
