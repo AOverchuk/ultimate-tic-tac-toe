@@ -241,6 +241,35 @@ namespace Tests.EditMode
 
         #endregion
 
+        #region GetStats Tests
+
+        [Test]
+        public void WhenGetStats_ThenReturnsAllPoolSizes()
+        {
+            // Arrange
+            var classAItem1 = new ClassA();
+            var classAItem2 = new ClassA();
+            var classBItem1 = new ClassB();
+            var classBItem2 = new ClassB();
+            var classBItem3 = new ClassB();
+
+            _pool.Return(classAItem1);
+            _pool.Return(classAItem2);
+            _pool.Return(classBItem1);
+            _pool.Return(classBItem2);
+            _pool.Return(classBItem3);
+
+            // Act
+            var stats = _pool.GetStats();
+
+            // Assert
+            stats.Count.Should().Be(2);
+            stats[typeof(ClassA)].Should().Be(2);
+            stats[typeof(ClassB)].Should().Be(3);
+        }
+
+        #endregion
+
         #region Test Classes
 
         private class TestClass { }
