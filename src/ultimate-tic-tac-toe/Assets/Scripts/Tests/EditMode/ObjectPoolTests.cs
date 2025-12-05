@@ -197,6 +197,31 @@ namespace Tests.EditMode
             _pool.GetSize(typeof(ClassB)).Should().Be(1);
         }
 
+        [Test]
+        public void WhenClearAll_ThenAllPoolsAreCleared()
+        {
+            // Arrange
+            var classAItem1 = new ClassA();
+            var classAItem2 = new ClassA();
+            var classBItem1 = new ClassB();
+            var classBItem2 = new ClassB();
+            var classBItem3 = new ClassB();
+
+            _pool.Return(classAItem1);
+            _pool.Return(classAItem2);
+            _pool.Return(classBItem1);
+            _pool.Return(classBItem2);
+            _pool.Return(classBItem3);
+
+            // Act
+            _pool.ClearAll();
+
+            // Assert
+            _pool.GetSize(typeof(ClassA)).Should().Be(0);
+            _pool.GetSize(typeof(ClassB)).Should().Be(0);
+            _pool.GetStats().Count.Should().Be(0);
+        }
+
         #endregion
 
         #region Test Classes
