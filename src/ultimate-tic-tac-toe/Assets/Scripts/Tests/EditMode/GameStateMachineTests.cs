@@ -313,5 +313,32 @@ namespace Tests.EditMode
             stateMachine.CurrentState.Should().BeSameAs(previousState);
             state2.DidNotReceive().Enter();
         }
+
+        [Test]
+        public void WhenNewStateEnterThrows_ThenPropagatesException()
+        {
+            // Arrange
+            const string expectedExceptionMessage = "Enter failed";
+            var state1 = Substitute.For<IState>();
+            var state2 = Substitute.For<IState>();
+            var expectedException = new InvalidOperationException(expectedExceptionMessage);
+            
+            state2.When(x => x.Enter()).Do(_ => throw expectedException);
+            
+            _stateFactory.CreateState<IState>().Returns(state1, state2);
+            var stateMachine = new GameStateMachine(_stateFactory);
+            
+            stateMachine.Enter<IState>();
+            
+            // Act
+            Action act = () => stateMachine.Enter<IState>();
+            
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage(expectedExceptionMessage);
+
+            stateMachine.CurrentState.Should().BeSameAs(state2);
+            state1.Received(1).Exit();
+        }
     }
 }
