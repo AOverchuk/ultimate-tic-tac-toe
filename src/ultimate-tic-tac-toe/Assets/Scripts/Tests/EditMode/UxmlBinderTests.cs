@@ -147,6 +147,56 @@ namespace Tests.EditMode
             target._missingButton.Should().BeNull("required element not found, field should remain null");
         }
 
+        [Test]
+        public void WhenOptionalElementMissing_ThenFieldRemainsNullSilently()
+        {
+            // Arrange
+            var root = new VisualElement();
+            var target = new TestViewOptionalElement();
+
+            // Act
+            UxmlBinder.BindElements(target, root);
+
+            // Assert
+            target._optionalButton.Should().BeNull("optional element not found, field should remain null without error");
+        }
+
+        #endregion
+
+        #region Field Filtering Tests
+
+        [Test]
+        public void WhenFieldWithoutAttribute_ThenNotBound()
+        {
+            // Arrange
+            var root = new VisualElement();
+            var button = new Button { name = "RegularButton" };
+            root.Add(button);
+            var target = new TestViewNoAttribute();
+
+            // Act
+            UxmlBinder.BindElements(target, root);
+
+            // Assert
+            target._regularButton.Should().BeNull("field without UxmlElement attribute should not be bound");
+        }
+
+        [Test]
+        public void WhenFieldIsNotVisualElement_ThenIgnored()
+        {
+            // Arrange
+            var root = new VisualElement();
+            var target = new TestViewInvalidField();
+            LogAssert.Expect(LogType.Warning, new System.Text.RegularExpressions.Regex(@"\[UxmlBinder\] Field _notVisualElement.*not a VisualElement type"));
+
+            // Act
+            Action act = () => UxmlBinder.BindElements(target, root);
+
+            // Assert
+            act.Should().NotThrow("non-VisualElement field should be ignored with warning");
+            target._notVisualElement.Should().BeNull("non-VisualElement field should remain null");
+        }
+
         #endregion
 
         #region Test Helper Classes
@@ -185,6 +235,23 @@ namespace Tests.EditMode
         {
             [Runtime.UI.Core.UxmlElement("MissingButton")]
             public Button _missingButton;
+        }
+
+        private class TestViewOptionalElement
+        {
+            [Runtime.UI.Core.UxmlElement("OptionalButton", isOptional: true)]
+            public Button _optionalButton;
+        }
+
+        private class TestViewNoAttribute
+        {
+            public Button _regularButton;
+        }
+
+        private class TestViewInvalidField
+        {
+            [Runtime.UI.Core.UxmlElement("Test")]
+            public string _notVisualElement;
         }
 
         #endregion
