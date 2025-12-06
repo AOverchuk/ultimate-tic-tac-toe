@@ -92,6 +92,63 @@ namespace Tests.EditMode
 
         #endregion
 
+        #region Name Transformation Tests
+
+        [Test]
+        public void WhenNameNotSpecified_ThenFieldNameTransformed()
+        {
+            // Arrange
+            var root = new VisualElement();
+            var button = new Button { name = "MyButton" };
+            root.Add(button);
+            var target = new TestViewAutoName();
+
+            // Act
+            UxmlBinder.BindElements(target, root);
+
+            // Assert
+            target._myButton.Should().NotBeNull("field name should be transformed: _myButton → MyButton");
+            target._myButton.Should().BeSameAs(button, "field should reference the exact Button instance");
+        }
+
+        [Test]
+        public void WhenExplicitName_ThenExplicitNameUsed()
+        {
+            // Arrange
+            var root = new VisualElement();
+            var button = new Button { name = "CustomName" };
+            root.Add(button);
+            var target = new TestViewExplicitName();
+
+            // Act
+            UxmlBinder.BindElements(target, root);
+
+            // Assert
+            target._button.Should().NotBeNull("field should be bound using explicit name");
+            target._button.Should().BeSameAs(button, "field should reference the Button with name 'CustomName'");
+        }
+
+        #endregion
+
+        #region Optional/Required Elements Tests
+
+        [Test]
+        public void WhenRequiredElementMissing_ThenFieldRemainsNull()
+        {
+            // Arrange
+            var root = new VisualElement();
+            var target = new TestViewRequiredElement();
+            LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(@"\[UxmlBinder\] Required element 'MissingButton'.*"));
+
+            // Act
+            UxmlBinder.BindElements(target, root);
+
+            // Assert
+            target._missingButton.Should().BeNull("required element not found, field should remain null");
+        }
+
+        #endregion
+
         #region Test Helper Classes
 
         private class TestViewSingleElement
@@ -110,6 +167,24 @@ namespace Tests.EditMode
             
             [Runtime.UI.Core.UxmlElement("Container")]
             public VisualElement _container;
+        }
+
+        private class TestViewAutoName
+        {
+            [Runtime.UI.Core.UxmlElement]
+            public Button _myButton;
+        }
+
+        private class TestViewExplicitName
+        {
+            [Runtime.UI.Core.UxmlElement("CustomName")]
+            public Button _button;
+        }
+
+        private class TestViewRequiredElement
+        {
+            [Runtime.UI.Core.UxmlElement("MissingButton")]
+            public Button _missingButton;
         }
 
         #endregion
