@@ -61,7 +61,7 @@ namespace Runtime.UI.Core
         }
 
         protected void BindVisibility(Observable<bool> source, VisualElement element) =>
-            source.Subscribe(isVisible => 
+            source.Subscribe(isVisible =>
                     element.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None)
                 .AddTo(_disposables);
 
