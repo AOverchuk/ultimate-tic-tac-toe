@@ -27,13 +27,13 @@ namespace Runtime.UI.MainMenu
             _exitButton.clicked += OnExitButtonClicked;
         }
 
-        private void OnStartButtonClicked()
+        internal void OnStartButtonClicked()
         {
             Debug.Log("[MainMenuView] Start button clicked");
             ViewModel.OnStartGameClicked.OnNext(Unit.Default);
         }
 
-        private void OnExitButtonClicked()
+        internal void OnExitButtonClicked()
         {
             Debug.Log("[MainMenuView] Exit button clicked");
             ViewModel.OnExitClicked.OnNext(Unit.Default);
@@ -51,4 +51,3 @@ namespace Runtime.UI.MainMenu
         }
     }
 }
-

@@ -33,11 +33,6 @@ namespace Tests.EditMode
 
         #region Core Functionality
 
-        /// <summary>
-        /// Проверяет основную функциональность Initialize:
-        /// - Подписка на события ViewModel
-        /// - Обработка OnStartGameClicked
-        /// </summary>
         [Test]
         public void WhenInitialize_ThenSubscribesToViewModelEvents()
         {
@@ -51,9 +46,6 @@ namespace Tests.EditMode
             _stateMachineMock.Received(1).Enter<LoadGameplayState>();
         }
 
-        /// <summary>
-        /// Проверяет подписку на команду выхода
-        /// </summary>
         [Test]
         public void WhenInitialize_ThenSubscribesToExitCommand()
         {
@@ -67,11 +59,6 @@ namespace Tests.EditMode
             act.Should().NotThrow("подписка на OnExitClicked должна работать корректно");
         }
 
-        /// <summary>
-        /// Проверяет полную функциональность OnStartGame:
-        /// - Переход в LoadGameplayState
-        /// - Блокировка UI (IsInteractable = false)
-        /// </summary>
         [Test]
         public void WhenOnStartGameClicked_ThenEntersGameplayStateAndDisablesUI()
         {
@@ -91,11 +78,6 @@ namespace Tests.EditMode
             subscription.Dispose();
         }
 
-        /// <summary>
-        /// Проверяет переподписку при повторном Initialize:
-        /// - Старые подписки должны быть отменены
-        /// - Новые подписки должны работать
-        /// </summary>
         [Test]
         public void WhenInitializeCalledTwice_ThenOldSubscriptionsDisposed()
         {
@@ -121,10 +103,6 @@ namespace Tests.EditMode
 
         #region Dispose Pattern
 
-        /// <summary>
-        /// Проверяет, что Dispose корректно отменяет подписки:
-        /// - После Dispose события ViewModel не обрабатываются
-        /// </summary>
         [Test]
         public void WhenDispose_ThenUnsubscribesFromEvents()
         {
@@ -139,10 +117,6 @@ namespace Tests.EditMode
             _stateMachineMock.DidNotReceive().Enter<LoadGameplayState>();
         }
 
-        /// <summary>
-        /// Проверяет идемпотентность Dispose:
-        /// - Множественные вызовы Dispose безопасны
-        /// </summary>
         [Test]
         public void WhenDisposeCalledTwice_ThenNoException()
         {
@@ -163,10 +137,6 @@ namespace Tests.EditMode
 
         #region Input Validation
 
-        /// <summary>
-        /// Проверяет валидацию входного параметра Initialize:
-        /// - null ViewModel должен вызывать ArgumentNullException
-        /// </summary>
         [Test]
         public void WhenInitializeWithNull_ThenThrowsArgumentNullException()
         {
@@ -177,10 +147,6 @@ namespace Tests.EditMode
                 .WithParameterName("viewModel");
         }
 
-        /// <summary>
-        /// Проверяет валидацию stateMachine в конструкторе:
-        /// - null stateMachine должен вызывать ArgumentNullException
-        /// </summary>
         [Test]
         public void WhenConstructorWithNull_ThenThrowsArgumentNullException()
         {
