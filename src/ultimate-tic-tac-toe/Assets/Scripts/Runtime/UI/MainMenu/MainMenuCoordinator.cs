@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Runtime.UI.MainMenu
 {
-    public class MainMenuCoordinator : IDisposable
+    public class MainMenuCoordinator : IMainMenuCoordinator
     {
         private MainMenuViewModel _viewModel;
         private readonly IGameStateMachine _stateMachine;

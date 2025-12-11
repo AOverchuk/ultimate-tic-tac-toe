@@ -8,7 +8,7 @@ using VContainer;
 
 namespace Runtime.Services.UI
 {
-    public class UIService : IDisposable
+    public class UIService : IUIService, IDisposable
     {
         private readonly ViewModelFactory _viewModelFactory;
         private readonly UIPoolManager _poolManager;

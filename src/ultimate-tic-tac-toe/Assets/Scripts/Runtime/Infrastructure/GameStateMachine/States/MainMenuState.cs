@@ -6,12 +6,13 @@ namespace Runtime.Infrastructure.GameStateMachine.States
 {
     public class MainMenuState : IState
     {
-        private readonly UIService _uiService;
-        private readonly MainMenuCoordinator _coordinator;
+        private readonly IUIService _uiService;
+        private readonly IMainMenuCoordinator _coordinator;
+        private bool _isExited;
 
         public MainMenuState(
-            UIService uiService, 
-            MainMenuCoordinator coordinator)
+            IUIService uiService, 
+            IMainMenuCoordinator coordinator)
         {
             _uiService = uiService;
             _coordinator = coordinator;
@@ -19,19 +20,31 @@ namespace Runtime.Infrastructure.GameStateMachine.States
 
         public void Enter()
         {
+            _isExited = false;
             Debug.Log("[MainMenuState] Entered MainMenu");
             var mainMenuPrefab = Resources.Load<GameObject>("MainMenu");
             _uiService.RegisterWindowPrefab<MainMenuView>(mainMenuPrefab);
             var view = _uiService.Open<MainMenuView, MainMenuViewModel>();
+            
+            if (view == null)
+            {
+                Debug.LogError("[MainMenuState] Failed to open MainMenuView!");
+                return;
+            }
+            
             var viewModel = view.GetViewModel();
             _coordinator.Initialize(viewModel);
         }
 
         public void Exit()
         {
+            if (_isExited)
+                return;
+            
+            _isExited = true;
             Debug.Log("[MainMenuState] Exiting MainMenu");
             _uiService.Close<MainMenuView>();
-            _coordinator?.Dispose();
+            _coordinator.Dispose();
         }
     }
 }

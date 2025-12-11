@@ -15,6 +15,8 @@ namespace Runtime.UI.Core
         protected VisualElement Root { get; private set; }
         protected TViewModel ViewModel { get; private set; }
 
+        public TViewModel GetViewModel() => ViewModel;
+
         public void SetViewModel(TViewModel viewModel)
         {
             ViewModel = viewModel;
