@@ -8,9 +8,9 @@ namespace Runtime.Infrastructure.GameStateMachine.States
     {
         private readonly IGameStateMachine _stateMachine;
         private readonly ISceneLoaderService _sceneLoader;
-        private readonly UIService _uiService;
+        private readonly IUIService _uiService;
 
-        public LoadMainMenuState(IGameStateMachine stateMachine, ISceneLoaderService sceneLoader, UIService uiService)
+        public LoadMainMenuState(IGameStateMachine stateMachine, ISceneLoaderService sceneLoader, IUIService uiService)
         {
             _stateMachine = stateMachine;
             _sceneLoader = sceneLoader;

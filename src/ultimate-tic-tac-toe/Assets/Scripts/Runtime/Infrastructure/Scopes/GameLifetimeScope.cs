@@ -17,7 +17,7 @@ namespace Runtime.Infrastructure.Scopes
             
             // Services
             builder.Register<ISceneLoaderService, SceneLoaderService>(Lifetime.Singleton);
-            builder.Register<UIService>(Lifetime.Singleton);
+            builder.Register<IUIService, UIService>(Lifetime.Singleton);
         
             // State Machine
             builder.Register<IStateFactory, StateFactory>(Lifetime.Singleton);

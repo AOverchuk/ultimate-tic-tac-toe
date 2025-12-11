@@ -8,9 +8,9 @@ namespace Runtime.Infrastructure.GameStateMachine.States
     {
         private readonly IGameStateMachine _stateMachine;
         private readonly ISceneLoaderService _sceneLoader;
-        private readonly UIService _uiService;
+        private readonly IUIService _uiService;
 
-        public LoadGameplayState(IGameStateMachine stateMachine, ISceneLoaderService sceneLoader, UIService uiService)
+        public LoadGameplayState(IGameStateMachine stateMachine, ISceneLoaderService sceneLoader, IUIService uiService)
         {
             _stateMachine = stateMachine;
             _sceneLoader = sceneLoader;
@@ -33,4 +33,3 @@ namespace Runtime.Infrastructure.GameStateMachine.States
         public void Exit() => Debug.Log("[LoadGameplayState] Exiting...");
     }
 }
-
