@@ -10,10 +10,10 @@ namespace Runtime.UI.MainMenu
         private readonly ReactiveProperty<string> _exitButtonText = new("Exit");
         private readonly ReactiveProperty<bool> _isInteractable = new(true);
 
-        public Observable<string> Title => _title;
-        public Observable<string> StartButtonText => _startButtonText;
-        public Observable<string> ExitButtonText => _exitButtonText;
-        public Observable<bool> IsInteractable => _isInteractable;
+        public ReadOnlyReactiveProperty<string> Title => _title;
+        public ReadOnlyReactiveProperty<string> StartButtonText => _startButtonText;
+        public ReadOnlyReactiveProperty<string> ExitButtonText => _exitButtonText;
+        public ReadOnlyReactiveProperty<bool> IsInteractable => _isInteractable;
         public Subject<Unit> OnStartGameClicked { get; } = new();
         public Subject<Unit> OnExitClicked { get; } = new();
 
