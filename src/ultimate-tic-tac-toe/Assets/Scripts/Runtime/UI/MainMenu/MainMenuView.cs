@@ -30,13 +30,13 @@ namespace Runtime.UI.MainMenu
         internal void OnStartButtonClicked()
         {
             Debug.Log("[MainMenuView] Start button clicked");
-            ViewModel.OnStartGameClicked.OnNext(Unit.Default);
+            ViewModel.RequestStartGame();
         }
 
         internal void OnExitButtonClicked()
         {
             Debug.Log("[MainMenuView] Exit button clicked");
-            ViewModel.OnExitClicked.OnNext(Unit.Default);
+            ViewModel.RequestExit();
         }
 
         protected override void OnDestroy()

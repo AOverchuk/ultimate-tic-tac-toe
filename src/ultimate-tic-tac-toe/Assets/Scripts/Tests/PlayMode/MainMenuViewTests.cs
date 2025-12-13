@@ -88,10 +88,10 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator WhenStartButtonClicked_ThenViewModelOnStartGameClickedTriggered()
+        public IEnumerator WhenStartButtonClicked_ThenViewModelStartGameRequestedTriggered()
         {
             var triggered = false;
-            var disposable = _viewModel.OnStartGameClicked.Subscribe(_ => triggered = true);
+            var disposable = _viewModel.StartGameRequested.Subscribe(_ => triggered = true);
 
             _view.OnStartButtonClicked();
 
@@ -103,10 +103,10 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator WhenExitButtonClicked_ThenViewModelOnExitClickedTriggered()
+        public IEnumerator WhenExitButtonClicked_ThenViewModelExitRequestedTriggered()
         {
             var triggered = false;
-            var disposable = _viewModel.OnExitClicked.Subscribe(_ => triggered = true);
+            var disposable = _viewModel.ExitRequested.Subscribe(_ => triggered = true);
 
             _view.OnExitButtonClicked();
 

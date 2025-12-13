@@ -48,7 +48,7 @@ namespace Tests.EditMode
             _coordinator.Initialize(_viewModel);
 
             // Act
-            _viewModel.OnStartGameClicked.OnNext(Unit.Default);
+            _viewModel.RequestStartGame();
 
             // Assert
             await _stateMachineMock.Received(1).EnterAsync<LoadGameplayState>(Arg.Any<CancellationToken>());
@@ -60,15 +60,15 @@ namespace Tests.EditMode
             // Arrange
             _coordinator.Initialize(_viewModel);
 
-            // Act - вызываем OnExitClicked (не проверяем Application.Quit, только подписку)
-            Action act = () => _viewModel.OnExitClicked.OnNext(Unit.Default);
+            // Act - вызываем запрос на выход (не проверяем Application.Quit, только подписку)
+            Action act = () => _viewModel.RequestExit();
 
             // Assert - проверяем что не падает (подписка работает)
-            act.Should().NotThrow("подписка на OnExitClicked должна работать корректно");
+            act.Should().NotThrow("подписка на ExitRequested должна работать корректно");
         }
 
         [Test]
-        public async Task WhenOnStartGameClicked_ThenEntersGameplayStateAndDisablesUI()
+        public async Task WhenStartGameRequested_ThenEntersGameplayStateAndDisablesUI()
         {
             // Arrange
             _coordinator.Initialize(_viewModel);
@@ -76,7 +76,7 @@ namespace Tests.EditMode
             var subscription = _viewModel.IsInteractable.Subscribe(value => interactableValue = value);
 
             // Act
-            _viewModel.OnStartGameClicked.OnNext(Unit.Default);
+            _viewModel.RequestStartGame();
 
             // Assert
             await _stateMachineMock.Received(1).EnterAsync<LoadGameplayState>(Arg.Any<CancellationToken>());
@@ -97,7 +97,7 @@ namespace Tests.EditMode
 
             // Act - переинициализация
             _coordinator.Initialize(viewModel2);
-            viewModel1.OnStartGameClicked.OnNext(Unit.Default);
+            viewModel1.RequestStartGame();
 
             // Assert - старая подписка не должна работать
             await _stateMachineMock.DidNotReceive().EnterAsync<LoadGameplayState>(Arg.Any<CancellationToken>());
@@ -119,7 +119,7 @@ namespace Tests.EditMode
             _coordinator.Dispose();
 
             // Act
-            _viewModel.OnStartGameClicked.OnNext(Unit.Default);
+            _viewModel.RequestStartGame();
 
             // Assert
             await _stateMachineMock.DidNotReceive().EnterAsync<LoadGameplayState>(Arg.Any<CancellationToken>());

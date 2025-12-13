@@ -20,8 +20,8 @@ namespace Tests.EditMode.UI.MainMenu
             sut.StartButtonText.CurrentValue.Should().Be("Start Game");
             sut.ExitButtonText.CurrentValue.Should().Be("Exit");
             sut.IsInteractable.CurrentValue.Should().BeTrue();
-            sut.OnStartGameClicked.Should().NotBeNull();
-            sut.OnExitClicked.Should().NotBeNull();
+            sut.StartGameRequested.Should().NotBeNull();
+            sut.ExitRequested.Should().NotBeNull();
         }
 
         [Test]
@@ -49,16 +49,16 @@ namespace Tests.EditMode.UI.MainMenu
             // Arrange
             var sut = new MainMenuViewModel();
             var valueEmitted = false;
-            sut.OnStartGameClicked.Subscribe(_ => valueEmitted = true);
+            sut.StartGameRequested.Subscribe(_ => valueEmitted = true);
 
-            sut.OnStartGameClicked.OnNext(Unit.Default);
+            sut.RequestStartGame();
             valueEmitted.Should().BeTrue("Subject should work before dispose");
 
             // Act
             sut.Dispose();
 
             // Assert
-            Action actSubject = () => sut.OnStartGameClicked.OnNext(Unit.Default);
+            Action actSubject = () => sut.RequestStartGame();
             actSubject.Should().Throw<ObjectDisposedException>();
 
             Action actProperty = () => sut.Title.Subscribe(_ => { });

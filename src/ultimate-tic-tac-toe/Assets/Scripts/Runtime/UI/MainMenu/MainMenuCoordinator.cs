@@ -30,11 +30,11 @@ namespace Runtime.UI.MainMenu
             Cleanup();
             _viewModel = viewModel;
             
-            _viewModel.OnStartGameClicked
+            _viewModel.StartGameRequested
                 .Subscribe(_ => OnStartGameAsync(_lifecycleCts.Token).Forget())
                 .AddTo(_disposables);
 
-            _viewModel.OnExitClicked
+            _viewModel.ExitRequested
                 .Subscribe(_ => OnExit())
                 .AddTo(_disposables);
         }
