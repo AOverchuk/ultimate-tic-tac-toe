@@ -1,4 +1,5 @@
 using R3;
+using Runtime.Extensions;
 using Runtime.UI.Core;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -23,8 +24,8 @@ namespace Runtime.UI.MainMenu
             BindEnabled(ViewModel.IsInteractable, _startButton);
             BindEnabled(ViewModel.IsInteractable, _exitButton);
 
-            _startButton.clicked += OnStartButtonClicked;
-            _exitButton.clicked += OnExitButtonClicked;
+            AddDisposable(_startButton.OnClickAsObservable().Subscribe(_ => OnStartButtonClicked()));
+            AddDisposable(_exitButton.OnClickAsObservable().Subscribe(_ => OnExitButtonClicked()));
         }
 
         internal void OnStartButtonClicked()
@@ -37,17 +38,6 @@ namespace Runtime.UI.MainMenu
         {
             Debug.Log("[MainMenuView] Exit button clicked");
             ViewModel.RequestExit();
-        }
-
-        protected override void OnDestroy()
-        {
-            if (_startButton != null)
-                _startButton.clicked -= OnStartButtonClicked;
-            
-            if (_exitButton != null)
-                _exitButton.clicked -= OnExitButtonClicked;
-
-            base.OnDestroy();
         }
     }
 }
