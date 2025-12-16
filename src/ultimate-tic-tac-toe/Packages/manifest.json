@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.artover1317.striplog": "https://github.com/ArtOver1317/striplog.git#v0.2.0",
     "com.annulusgames.lit-motion": "https://github.com/annulusgames/LitMotion.git?path=src/LitMotion/Assets/LitMotion",
     "com.codewriter.triinspector": "https://github.com/codewriter-packages/Tri-Inspector.git",
     "com.cysharp.r3": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",

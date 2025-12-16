@@ -12,10 +12,11 @@
       "hash": "b651c5866fe0e3fba065ce2e56dfdfcd59d3d109"
     },
     "com.artover1317.striplog": {
-      "version": "file:com.artover1317.striplog",
+      "version": "https://github.com/ArtOver1317/striplog.git#v0.2.0",
       "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
+      "source": "git",
+      "dependencies": {},
+      "hash": "f548eaa88778817d586302c6bcccf06697c75d4f"
     },
     "com.codewriter.triinspector": {
       "version": "https://github.com/codewriter-packages/Tri-Inspector.git",
