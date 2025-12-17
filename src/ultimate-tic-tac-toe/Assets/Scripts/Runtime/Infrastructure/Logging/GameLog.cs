@@ -1,6 +1,5 @@
 using System;
 using StripLog;
-using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Runtime.Infrastructure.Logging

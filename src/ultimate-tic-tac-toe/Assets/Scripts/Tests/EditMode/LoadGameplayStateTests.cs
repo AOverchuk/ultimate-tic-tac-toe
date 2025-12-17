@@ -6,6 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Runtime.Infrastructure.GameStateMachine;
 using Runtime.Infrastructure.GameStateMachine.States;
+using Runtime.Services.Assets;
 using Runtime.Services.Scenes;
 using Runtime.Services.UI;
 
@@ -17,6 +18,7 @@ namespace Tests.EditMode
         private IGameStateMachine _stateMachine;
         private ISceneLoaderService _sceneLoader;
         private IUIService _uiService;
+        private IAssetProvider _assets;
         private LoadGameplayState _sut;
         private CancellationToken _cancellationToken;
 
@@ -26,9 +28,10 @@ namespace Tests.EditMode
             _stateMachine = Substitute.For<IGameStateMachine>();
             _sceneLoader = Substitute.For<ISceneLoaderService>();
             _uiService = Substitute.For<IUIService>();
+            _assets = Substitute.For<IAssetProvider>();
             _cancellationToken = CancellationToken.None;
 
-            _sut = new LoadGameplayState(_stateMachine, _sceneLoader, _uiService);
+            _sut = new LoadGameplayState(_stateMachine, _sceneLoader, _uiService, _assets);
         }
 
         [Test]
@@ -38,6 +41,7 @@ namespace Tests.EditMode
             _sceneLoader
                 .LoadSceneAsync(SceneNames.Gameplay, Arg.Any<CancellationToken>())
                 .Returns(UniTask.CompletedTask);
+            
             _stateMachine.EnterAsync<GameplayState>(Arg.Any<CancellationToken>())
                 .Returns(UniTask.CompletedTask);
 
@@ -48,6 +52,7 @@ namespace Tests.EditMode
             Received.InOrder(() =>
             {
                 _uiService.ClearViewModelPools();
+                _assets.Cleanup();
                 _sceneLoader.LoadSceneAsync(SceneNames.Gameplay, Arg.Any<CancellationToken>());
                 _stateMachine.EnterAsync<GameplayState>(Arg.Any<CancellationToken>());
             });
@@ -60,6 +65,7 @@ namespace Tests.EditMode
             _sceneLoader
                 .LoadSceneAsync(SceneNames.Gameplay, Arg.Any<CancellationToken>())
                 .Returns(UniTask.CompletedTask);
+            
             _stateMachine.EnterAsync<GameplayState>(Arg.Any<CancellationToken>())
                 .Returns(UniTask.CompletedTask);
 

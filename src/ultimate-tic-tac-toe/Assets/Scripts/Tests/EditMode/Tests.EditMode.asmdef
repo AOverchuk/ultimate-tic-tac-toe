@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "Runtime",
         "VContainer",
-        "UniTask"
+        "UniTask",
+        "Unity.Addressables"
     ],
     "includePlatforms": [
         "Editor"

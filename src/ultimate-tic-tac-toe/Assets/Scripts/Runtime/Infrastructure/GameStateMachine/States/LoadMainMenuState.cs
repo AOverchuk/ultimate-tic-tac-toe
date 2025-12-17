@@ -1,6 +1,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Runtime.Infrastructure.Logging;
+using Runtime.Services.Assets;
 using Runtime.Services.Scenes;
 using Runtime.Services.UI;
 using StripLog;
@@ -12,12 +13,18 @@ namespace Runtime.Infrastructure.GameStateMachine.States
         private readonly IGameStateMachine _stateMachine;
         private readonly ISceneLoaderService _sceneLoader;
         private readonly IUIService _uiService;
+        private readonly IAssetProvider _assets;
 
-        public LoadMainMenuState(IGameStateMachine stateMachine, ISceneLoaderService sceneLoader, IUIService uiService)
+        public LoadMainMenuState(
+            IGameStateMachine stateMachine,
+            ISceneLoaderService sceneLoader,
+            IUIService uiService,
+            IAssetProvider assets)
         {
             _stateMachine = stateMachine;
             _sceneLoader = sceneLoader;
             _uiService = uiService;
+            _assets = assets;
         }
 
         public async UniTask EnterAsync(CancellationToken cancellationToken = default)
@@ -25,6 +32,7 @@ namespace Runtime.Infrastructure.GameStateMachine.States
             cancellationToken.ThrowIfCancellationRequested();
             Log.Debug(LogTags.Scenes, "[LoadMainMenuState] Loading MainMenu scene...");
             _uiService.ClearViewModelPools();
+            _assets.Cleanup();
             await _sceneLoader.LoadSceneAsync(SceneNames.MainMenu, cancellationToken);
             Log.Debug(LogTags.Scenes, "[LoadMainMenuState] MainMenu scene loaded");
             await _stateMachine.EnterAsync<MainMenuState>(cancellationToken);

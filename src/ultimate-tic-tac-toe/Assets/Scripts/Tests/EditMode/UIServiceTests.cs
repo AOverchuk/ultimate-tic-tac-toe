@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -110,7 +111,7 @@ namespace Tests.EditMode
         public void WhenWindowNotRegistered_ThenReturnsNull()
         {
             // Arrange
-            LogAssert.Expect(LogType.Error, "[UIService] Window TestWindow prefab not registered!");
+            LogAssert.Expect(LogType.Error, new Regex(@"Window TestWindow prefab not registered!"));
 
             // Act
             var result = _uiService.Open<TestWindow, TestViewModel>();
@@ -216,7 +217,7 @@ namespace Tests.EditMode
         {
             // Arrange
             var configWasCalled = false;
-            LogAssert.Expect(LogType.Error, "[UIService] Window TestWindow prefab not registered!");
+            LogAssert.Expect(LogType.Error, new Regex(@"Window TestWindow prefab not registered!"));
 
             // Act
             _uiService.Open<TestWindow, TestViewModel>(_ => configWasCalled = true);
@@ -245,13 +246,10 @@ namespace Tests.EditMode
         }
 
         [Test]
-        public void WhenHideNonExistentWindow_ThenNothingHappens()
-        {
+        public void WhenHideNonExistentWindow_ThenNothingHappens() =>
             // Arrange - no window opened
-
             // Act & Assert
             _uiService.Invoking(s => s.Hide<TestWindow>()).Should().NotThrow();
-        }
 
         #endregion
 
@@ -325,13 +323,10 @@ namespace Tests.EditMode
         }
 
         [Test]
-        public void WhenCloseNonExistentWindow_ThenNothingHappens()
-        {
+        public void WhenCloseNonExistentWindow_ThenNothingHappens() =>
             // Arrange - no window opened
-
             // Act & Assert
             _uiService.Invoking(s => s.Close<TestWindow>()).Should().NotThrow();
-        }
 
         #endregion
 

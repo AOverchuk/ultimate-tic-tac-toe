@@ -6,10 +6,8 @@ namespace Runtime.Services.Scenes
 {
     public class SceneLoaderService : ISceneLoaderService
     {
-        public async UniTask LoadSceneAsync(string sceneName, CancellationToken cancellationToken = default)
-        {
+        public async UniTask LoadSceneAsync(string sceneName, CancellationToken cancellationToken = default) => 
             await LoadSceneAsync(sceneName, LoadSceneMode.Single, cancellationToken);
-        }
 
         public async UniTask LoadSceneAsync(string sceneName, LoadSceneMode mode, CancellationToken cancellationToken = default)
         {

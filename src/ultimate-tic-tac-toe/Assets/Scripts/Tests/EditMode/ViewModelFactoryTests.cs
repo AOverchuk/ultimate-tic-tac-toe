@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -165,7 +166,7 @@ namespace Tests.EditMode
             _mockContainer.Resolve(typeof(TestViewModelPrivateCtor))
                 .Returns(_ => throw new Exception("Type not registered"));
             
-            LogAssert.Expect(LogType.Error, "[ViewModelFactory] No public constructor found for TestViewModelPrivateCtor");
+            LogAssert.Expect(LogType.Error, new Regex(@"No public constructor found for TestViewModelPrivateCtor"));
 
             // Act
             var result = _factory.CreateViewModel<TestViewModelPrivateCtor>();
@@ -218,7 +219,7 @@ namespace Tests.EditMode
             _mockContainer.Resolve(typeof(ITestService))
                 .Returns(_ => throw new Exception("Dependency resolution failed"));
             
-            LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(@"\[ViewModelFactory\] Failed to resolve ITestService for TestViewModelWithDeps.*"));
+            LogAssert.Expect(LogType.Error, new Regex(@"\[ViewModelFactory\] Failed to resolve ITestService for TestViewModelWithDeps.*"));
 
             // Act
             var result = _factory.CreateViewModel<TestViewModelWithDeps>();

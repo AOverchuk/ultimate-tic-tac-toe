@@ -1,10 +1,14 @@
 ﻿using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Runtime.Infrastructure.GameStateMachine.States;
+using Runtime.Services.Assets;
 using Runtime.Services.UI;
 using Runtime.UI.MainMenu;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
@@ -15,17 +19,30 @@ namespace Tests.EditMode
     {
         private IUIService _uiService;
         private IMainMenuCoordinator _coordinator;
+        private IAssetProvider _assets;
+        private AssetLibrary _assetLibrary;
         private MainMenuState _state;
         private GameObject _viewGameObject;
         private TestMainMenuView _testView;
         private MainMenuViewModel _viewModel;
+        private GameObject _mainMenuPrefab;
 
         [SetUp]
         public void SetUp()
         {
             _uiService = Substitute.For<IUIService>();
             _coordinator = Substitute.For<IMainMenuCoordinator>();
+            _assets = Substitute.For<IAssetProvider>();
             _viewModel = new MainMenuViewModel();
+
+            _assetLibrary = ScriptableObject.CreateInstance<AssetLibrary>();
+            _assetLibrary.MainMenuPrefab = new AssetReferenceGameObject("00000000000000000000000000000000");
+
+            _mainMenuPrefab = new GameObject("MainMenuPrefab");
+            
+            _assets
+                .LoadAsync<GameObject>(_assetLibrary.MainMenuPrefab, Arg.Any<System.Threading.CancellationToken>())
+                .Returns(UniTask.FromResult(_mainMenuPrefab));
 
             _viewGameObject = new GameObject("TestMainMenuView");
             _testView = _viewGameObject.AddComponent<TestMainMenuView>();
@@ -33,7 +50,7 @@ namespace Tests.EditMode
 
             _uiService.Open<MainMenuView, MainMenuViewModel>().Returns(_testView);
 
-            _state = new MainMenuState(_uiService, _coordinator);
+            _state = new MainMenuState(_uiService, _coordinator, _assets, _assetLibrary);
         }
 
         [TearDown]
@@ -41,6 +58,12 @@ namespace Tests.EditMode
         {
             if (_viewGameObject != null)
                 Object.DestroyImmediate(_viewGameObject);
+
+            if (_mainMenuPrefab != null)
+                Object.DestroyImmediate(_mainMenuPrefab);
+
+            if (_assetLibrary != null)
+                Object.DestroyImmediate(_assetLibrary);
 
             _viewModel?.Dispose();
         }
@@ -54,7 +77,10 @@ namespace Tests.EditMode
             await _state.EnterAsync();
 
             // Assert
-            _uiService.Received(1).RegisterWindowPrefab<MainMenuView>(Arg.Any<GameObject>());
+            await _assets.Received(1)
+                .LoadAsync<GameObject>(_assetLibrary.MainMenuPrefab, Arg.Any<System.Threading.CancellationToken>());
+            
+            _uiService.Received(1).RegisterWindowPrefab<MainMenuView>(_mainMenuPrefab);
         }
 
         [Test]
@@ -92,7 +118,8 @@ namespace Tests.EditMode
             // Assert
             Received.InOrder(() =>
             {
-                _uiService.RegisterWindowPrefab<MainMenuView>(Arg.Any<GameObject>());
+                _assets.LoadAsync<GameObject>(_assetLibrary.MainMenuPrefab, Arg.Any<System.Threading.CancellationToken>());
+                _uiService.RegisterWindowPrefab<MainMenuView>(_mainMenuPrefab);
                 _uiService.Open<MainMenuView, MainMenuViewModel>();
                 _coordinator.Initialize(_viewModel);
             });
@@ -129,7 +156,7 @@ namespace Tests.EditMode
         {
             // Arrange
             _uiService.Open<MainMenuView, MainMenuViewModel>().Returns((MainMenuView)null);
-            LogAssert.Expect(LogType.Error, "[MainMenuState] Failed to open MainMenuView!");
+            LogAssert.Expect(LogType.Error, new Regex(@"Failed to open MainMenuView"));
             
             // Act
             await _state.EnterAsync();

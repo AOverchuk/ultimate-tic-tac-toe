@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -252,7 +253,7 @@ namespace Tests.PlayMode
             var nonTextElement = _view.TestVisibilityElement; // VisualElement, не TextElement
 
             // Act & Assert
-            LogAssert.Expect(LogType.Error, "Element TestVisibilityElement is not a TextElement");
+            LogAssert.Expect(LogType.Error, new Regex(@"Element TestVisibilityElement is not a TextElement"));
 
             _view.TestBindText(textProperty, nonTextElement);
 
@@ -430,9 +431,9 @@ namespace Tests.PlayMode
             // UIDocument будет добавлен автоматически из-за [RequireComponent],
             // но без visualTreeAsset rootVisualElement будет пустым
             // UxmlBinder попытается найти элементы и выдаст ошибки для каждого обязательного поля
-            LogAssert.Expect(LogType.Error, "[UxmlBinder] Required element 'TestButton' of type Button not found in UXML for field _testButton in TestView!");
-            LogAssert.Expect(LogType.Error, "[UxmlBinder] Required element 'TestLabel' of type Label not found in UXML for field _testLabel in TestView!");
-            LogAssert.Expect(LogType.Error, "[UxmlBinder] Required element 'TestVisibilityElement' of type VisualElement not found in UXML for field _testVisibilityElement in TestView!");
+            LogAssert.Expect(LogType.Error, new Regex(@"\[UxmlBinder\] Required element 'TestButton' of type Button not found"));
+            LogAssert.Expect(LogType.Error, new Regex(@"\[UxmlBinder\] Required element 'TestLabel' of type Label not found"));
+            LogAssert.Expect(LogType.Error, new Regex(@"\[UxmlBinder\] Required element 'TestVisibilityElement' of type VisualElement not found"));
 
             // Act & Assert - не должно быть исключений
             Assert.DoesNotThrow(() =>

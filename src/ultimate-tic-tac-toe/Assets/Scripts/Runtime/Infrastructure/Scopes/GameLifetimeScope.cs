@@ -1,10 +1,12 @@
 using Runtime.Infrastructure.EntryPoint;
 using Runtime.Infrastructure.GameStateMachine;
 using Runtime.Infrastructure.GameStateMachine.States;
+using Runtime.Services.Assets;
 using Runtime.Services.Scenes;
 using Runtime.Services.UI;
 using Runtime.UI.MainMenu;
 using Runtime.UI.Core;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -12,11 +14,18 @@ namespace Runtime.Infrastructure.Scopes
 {
     public class GameLifetimeScope : LifetimeScope
     {
+        [SerializeField] private AssetLibrary AssetLibrary;
+
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<GameEntryPoint>();
+
+            if (AssetLibrary == null)
+                throw new System.InvalidOperationException("AssetLibrary is not assigned in GameLifetimeScope.");
             
             // Services
+            builder.RegisterInstance(AssetLibrary);
+            builder.Register<IAssetProvider, AddressablesAssetProvider>(Lifetime.Singleton);
             builder.Register<ISceneLoaderService, SceneLoaderService>(Lifetime.Singleton);
             builder.Register<ViewModelFactory>(Lifetime.Singleton);
             builder.Register<UIPoolManager>(Lifetime.Singleton);

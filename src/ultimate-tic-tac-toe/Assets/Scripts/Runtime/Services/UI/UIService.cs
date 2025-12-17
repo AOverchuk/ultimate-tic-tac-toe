@@ -97,11 +97,15 @@ namespace Runtime.Services.UI
             var windowTypes = _activeWindows.Keys.ToList();
             
             foreach (var windowType in windowTypes)
+            {
                 TryCloseWindow(windowType);
-            
+            }
+
             foreach (var subscription in _closeSubscriptions.Values)
+            {
                 subscription?.Dispose();
-            
+            }
+
             _closeSubscriptions.Clear();
             Log.Debug(LogTags.Services, "[UIService] Closed all windows");
         }

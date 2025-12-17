@@ -1,10 +1,10 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Runtime.Infrastructure.Logging;
+using Runtime.Services.Assets;
 using Runtime.Services.UI;
 using Runtime.UI.MainMenu;
 using StripLog;
-using UnityEngine;
 
 namespace Runtime.Infrastructure.GameStateMachine.States
 {
@@ -12,35 +12,39 @@ namespace Runtime.Infrastructure.GameStateMachine.States
     {
         private readonly IUIService _uiService;
         private readonly IMainMenuCoordinator _coordinator;
+        private readonly IAssetProvider _assets;
+        private readonly AssetLibrary _assetLibrary;
         private bool _isExited;
 
         public MainMenuState(
             IUIService uiService, 
-            IMainMenuCoordinator coordinator)
+            IMainMenuCoordinator coordinator,
+            IAssetProvider assets,
+            AssetLibrary assetLibrary)
         {
             _uiService = uiService;
             _coordinator = coordinator;
+            _assets = assets;
+            _assetLibrary = assetLibrary;
         }
 
-        public UniTask EnterAsync(CancellationToken cancellationToken = default)
+        public async UniTask EnterAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             _isExited = false;
             Log.Debug(LogTags.Scenes, "[MainMenuState] Entered MainMenu");
-            var mainMenuPrefab = Resources.Load<GameObject>("MainMenu");
+            var mainMenuPrefab = await _assets.LoadAsync<UnityEngine.GameObject>(_assetLibrary.MainMenuPrefab, cancellationToken);
             _uiService.RegisterWindowPrefab<MainMenuView>(mainMenuPrefab);
             var view = _uiService.Open<MainMenuView, MainMenuViewModel>();
             
             if (view == null)
             {
                 Log.Error(LogTags.UI, "[MainMenuState] Failed to open MainMenuView!");
-                return UniTask.CompletedTask;
+                return;
             }
             
             var viewModel = view.GetViewModel();
             _coordinator.Initialize(viewModel);
-
-            return UniTask.CompletedTask;
         }
 
         public void Exit()

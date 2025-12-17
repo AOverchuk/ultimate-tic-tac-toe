@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using NUnit.Framework;
 using Runtime.UI.Core;
@@ -18,7 +19,7 @@ namespace Tests.EditMode
         {
             // Arrange
             var root = new VisualElement();
-            LogAssert.Expect(LogType.Error, "[UxmlBinder] Target or root is null!");
+            LogAssert.Expect(LogType.Error, new Regex(@"\[UxmlBinder\] Target or root is null!"));
 
             // Act
             Action act = () => UxmlBinder.BindElements(null, root);
@@ -32,7 +33,7 @@ namespace Tests.EditMode
         {
             // Arrange
             var target = new TestViewSingleElement();
-            LogAssert.Expect(LogType.Error, "[UxmlBinder] Target or root is null!");
+            LogAssert.Expect(LogType.Error, new Regex(@"\[UxmlBinder\] Target or root is null!"));
 
             // Act
             Action act = () => UxmlBinder.BindElements(target, null);
@@ -58,8 +59,8 @@ namespace Tests.EditMode
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target._testButton.Should().NotBeNull("field should be bound to the found element");
-            target._testButton.Should().BeSameAs(button, "field should reference the exact Button instance");
+            target.TestButton.Should().NotBeNull("field should be bound to the found element");
+            target.TestButton.Should().BeSameAs(button, "field should reference the exact Button instance");
         }
 
         [Test]
@@ -81,13 +82,13 @@ namespace Tests.EditMode
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target._myButton.Should().NotBeNull("button field should be bound");
-            target._myLabel.Should().NotBeNull("label field should be bound");
-            target._container.Should().NotBeNull("container field should be bound");
+            target.MyButton.Should().NotBeNull("button field should be bound");
+            target.MyLabel.Should().NotBeNull("label field should be bound");
+            target.Container.Should().NotBeNull("container field should be bound");
             
-            target._myButton.Should().BeSameAs(button, "button field should reference the exact Button instance");
-            target._myLabel.Should().BeSameAs(label, "label field should reference the exact Label instance");
-            target._container.Should().BeSameAs(container, "container field should reference the exact VisualElement instance");
+            target.MyButton.Should().BeSameAs(button, "button field should reference the exact Button instance");
+            target.MyLabel.Should().BeSameAs(label, "label field should reference the exact Label instance");
+            target.Container.Should().BeSameAs(container, "container field should reference the exact VisualElement instance");
         }
 
         #endregion
@@ -107,8 +108,8 @@ namespace Tests.EditMode
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target._myButton.Should().NotBeNull("field name should be transformed: _myButton → MyButton");
-            target._myButton.Should().BeSameAs(button, "field should reference the exact Button instance");
+            target.MyButton.Should().NotBeNull("field name should be transformed: _myButton → MyButton");
+            target.MyButton.Should().BeSameAs(button, "field should reference the exact Button instance");
         }
 
         [Test]
@@ -124,8 +125,8 @@ namespace Tests.EditMode
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target._button.Should().NotBeNull("field should be bound using explicit name");
-            target._button.Should().BeSameAs(button, "field should reference the Button with name 'CustomName'");
+            target.Button.Should().NotBeNull("field should be bound using explicit name");
+            target.Button.Should().BeSameAs(button, "field should reference the Button with name 'CustomName'");
         }
 
         [Test]
@@ -141,8 +142,8 @@ namespace Tests.EditMode
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target.myButton.Should().NotBeNull("field name without underscore should be transformed: myButton → MyButton");
-            target.myButton.Should().BeSameAs(button, "field should reference the exact Button instance");
+            target.MyButton.Should().NotBeNull("field name without underscore should be transformed: myButton → MyButton");
+            target.MyButton.Should().BeSameAs(button, "field should reference the exact Button instance");
         }
 
         #endregion
@@ -155,13 +156,13 @@ namespace Tests.EditMode
             // Arrange
             var root = new VisualElement();
             var target = new TestViewRequiredElement();
-            LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(@"\[UxmlBinder\] Required element 'MissingButton'.*"));
+            LogAssert.Expect(LogType.Error, new Regex(@"\[UxmlBinder\] Required element 'MissingButton'.*"));
 
             // Act
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target._missingButton.Should().BeNull("required element not found, field should remain null");
+            target.MissingButton.Should().BeNull("required element not found, field should remain null");
         }
 
         [Test]
@@ -175,7 +176,7 @@ namespace Tests.EditMode
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target._optionalButton.Should().BeNull("optional element not found, field should remain null without error");
+            target.OptionalButton.Should().BeNull("optional element not found, field should remain null without error");
         }
 
         #endregion
@@ -195,7 +196,7 @@ namespace Tests.EditMode
             UxmlBinder.BindElements(target, root);
 
             // Assert
-            target._regularButton.Should().BeNull("field without UxmlElement attribute should not be bound");
+            target.RegularButton.Should().BeNull("field without UxmlElement attribute should not be bound");
         }
 
         [Test]
@@ -211,7 +212,7 @@ namespace Tests.EditMode
 
             // Assert
             act.Should().NotThrow("non-VisualElement field should be ignored with warning");
-            target._notVisualElement.Should().BeNull("non-VisualElement field should remain null");
+            target.NotVisualElement.Should().BeNull("non-VisualElement field should remain null");
         }
 
         #endregion
@@ -221,60 +222,79 @@ namespace Tests.EditMode
         private class TestViewSingleElement
         {
             [Runtime.UI.Core.UxmlElement("TestButton")]
-            public Button _testButton;
+            private Button _testButton;
+
+            public Button TestButton => _testButton;
         }
 
         private class TestViewMultipleElements
         {
             [Runtime.UI.Core.UxmlElement("MyButton")]
-            public Button _myButton;
+            private Button _myButton;
             
             [Runtime.UI.Core.UxmlElement("MyLabel")]
-            public Label _myLabel;
+            private Label _myLabel;
             
             [Runtime.UI.Core.UxmlElement("Container")]
-            public VisualElement _container;
+            private VisualElement _container;
+
+            public Button MyButton => _myButton;
+            public Label MyLabel => _myLabel;
+            public VisualElement Container => _container;
         }
 
         private class TestViewAutoName
         {
             [Runtime.UI.Core.UxmlElement]
-            public Button _myButton;
+            private Button _myButton;
+
+            public Button MyButton => _myButton;
         }
 
         private class TestViewExplicitName
         {
             [Runtime.UI.Core.UxmlElement("CustomName")]
-            public Button _button;
+            private Button _button;
+
+            public Button Button => _button;
         }
 
         private class TestViewNoUnderscore
         {
             [Runtime.UI.Core.UxmlElement]
-            public Button myButton;
+            private Button myButton;
+
+            public Button MyButton => myButton;
         }
 
         private class TestViewRequiredElement
         {
             [Runtime.UI.Core.UxmlElement("MissingButton")]
-            public Button _missingButton;
+            private Button _missingButton;
+
+            public Button MissingButton => _missingButton;
         }
 
         private class TestViewOptionalElement
         {
             [Runtime.UI.Core.UxmlElement("OptionalButton", isOptional: true)]
-            public Button _optionalButton;
+            private Button _optionalButton;
+
+            public Button OptionalButton => _optionalButton;
         }
 
         private class TestViewNoAttribute
         {
-            public Button _regularButton;
+            private Button _regularButton;
+
+            public Button RegularButton => _regularButton;
         }
 
         private class TestViewInvalidField
         {
-            [Runtime.UI.Core.UxmlElement("Test")]
-            public string _notVisualElement;
+            [Runtime.UI.Core.UxmlElement("Test")] private string _notVisualElement;
+
+            public string NotVisualElement => _notVisualElement;
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -76,7 +77,7 @@ namespace Tests.PlayMode
             _mockWindowPool.Get<TestWindow>(typeof(TestWindow)).Returns((TestWindow)null);
 
             // Expect error log from UIPoolManager
-            LogAssert.Expect(LogType.Error, "[UIPoolManager] Prefab doesn't have TestWindow component!");
+            LogAssert.Expect(LogType.Error, new Regex(@"\[UIPoolManager\] Prefab doesn't have TestWindow component!"));
 
             try
             {
