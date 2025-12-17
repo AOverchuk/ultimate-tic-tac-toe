@@ -32,7 +32,13 @@ namespace Runtime.UI.MainMenu
             _viewModel = viewModel;
             
             _viewModel.StartGameRequested
-                .Subscribe(_ => OnStartGameAsync(_lifecycleCts.Token).Forget())
+                .Subscribe(_ => OnStartGameAsync(_lifecycleCts.Token).Forget(ex =>
+                {
+                    if (ex is OperationCanceledException)
+                        return;
+
+                    Log.Exception(ex, LogTags.UI);
+                }))
                 .AddTo(_disposables);
 
             _viewModel.ExitRequested

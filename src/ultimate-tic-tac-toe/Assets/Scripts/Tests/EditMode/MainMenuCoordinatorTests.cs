@@ -9,6 +9,8 @@ using R3;
 using Runtime.Infrastructure.GameStateMachine;
 using Runtime.Infrastructure.GameStateMachine.States;
 using Runtime.UI.MainMenu;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Tests.EditMode
 {
@@ -84,6 +86,54 @@ namespace Tests.EditMode
             interactableValue.Should().BeFalse("UI должен быть заблокирован во время перехода в игру");
 
             subscription.Dispose();
+        }
+
+        [Test]
+        public async Task WhenStartGameRequestedAndStateMachineThrows_ThenExceptionIsHandled()
+        {
+            // Arrange
+            Exception unobservedException = null;
+            var exceptionLogReceived = false;
+
+            void OnUnobservedException(Exception ex) => unobservedException = ex;
+
+            void OnUnityLogReceived(string condition, string stackTrace, LogType type)
+            {
+                if (type is not (LogType.Error or LogType.Exception))
+                    return;
+
+                if (condition?.Contains("InvalidOperationException: boom") == true)
+                    exceptionLogReceived = true;
+            }
+
+            UniTaskScheduler.UnobservedTaskException += OnUnobservedException;
+            Application.logMessageReceived += OnUnityLogReceived;
+
+            var previousIgnoreFailingMessages = LogAssert.ignoreFailingMessages;
+            LogAssert.ignoreFailingMessages = true;
+            
+            try
+            {
+                _stateMachineMock.EnterAsync<LoadGameplayState>(Arg.Any<CancellationToken>())
+                    .Returns(UniTask.FromException(new InvalidOperationException("boom")));
+
+                _coordinator.Initialize(_viewModel);
+
+                // Act
+                _viewModel.Invoking(vm => vm.RequestStartGame()).Should().NotThrow();
+                await UniTask.Yield();
+
+                // Assert
+                unobservedException.Should().BeNull("MainMenuCoordinator should handle exceptions from fire-and-forget async handlers");
+                exceptionLogReceived.Should().BeTrue("handled exceptions should be logged so they are not silently lost");
+            }
+            finally
+            {
+                LogAssert.ignoreFailingMessages = previousIgnoreFailingMessages;
+
+                Application.logMessageReceived -= OnUnityLogReceived;
+                UniTaskScheduler.UnobservedTaskException -= OnUnobservedException;
+            }
         }
 
         [Test]
