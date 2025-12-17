@@ -7,7 +7,9 @@ namespace Runtime.UI.Core
     {
         private readonly CompositeDisposable _disposables = new();
 
-        public Subject<Unit> OnCloseRequested { get; } = new();
+        private readonly Subject<Unit> _closeRequested = new();
+
+        public Observable<Unit> OnCloseRequested => _closeRequested;
 
         protected void AddDisposable(IDisposable disposable) => _disposables.Add(disposable);
 
@@ -24,12 +26,12 @@ namespace Runtime.UI.Core
         public void Dispose()
         {
             OnDispose();
-            OnCloseRequested?.Dispose();
+            _closeRequested.Dispose();
             _disposables.Dispose();
         }
 
         protected virtual void OnDispose() { }
 
-        public void RequestClose() => OnCloseRequested.OnNext(Unit.Default);
+        public void RequestClose() => _closeRequested.OnNext(Unit.Default);
     }
 }
