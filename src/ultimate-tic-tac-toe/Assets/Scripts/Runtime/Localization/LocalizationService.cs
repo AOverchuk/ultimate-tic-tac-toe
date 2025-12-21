@@ -8,6 +8,8 @@ namespace Runtime.Localization
 {
     public sealed class LocalizationService : ILocalizationService, IDisposable
     {
+        private const int _maxReportedMissingKeys = 4096;
+
         private readonly ILocalizationStore _store;
         private readonly ILocalizationLoader _loader;
         private readonly ILocalizationParser _parser;
@@ -20,10 +22,16 @@ namespace Runtime.Localization
         private readonly ReactiveProperty<bool> _isBusy;
         private readonly Subject<LocalizationError> _errors = new();
 
+        private readonly HashSet<MissingKeyReportKey> _reportedMissingKeys = new();
+
         private bool _isInitialized;
+
+        private readonly SemaphoreSlim _initializeGate = new(1, 1);
 
         private readonly object _switchLock = new();
         private CancellationTokenSource _switchCts;
+        private int _switchVersion;
+        private readonly SemaphoreSlim _saveGate = new(1, 1);
         private int _busyCount;
 
         public ReadOnlyReactiveProperty<LocaleId> CurrentLocale => _currentLocale;
@@ -55,13 +63,16 @@ namespace Runtime.Localization
 
         public async UniTask InitializeAsync(CancellationToken cancellationToken)
         {
-            if (_isInitialized)
-                return;
-
-            EnterBusy();
-            
+            await _initializeGate.WaitAsync(cancellationToken);
+            var enteredBusy = false;
             try
             {
+                if (_isInitialized)
+                    return;
+
+                EnterBusy();
+                enteredBusy = true;
+
                 var supported = _catalog.GetSupportedLocales();
 
                 var locale = _policy.DefaultLocale;
@@ -92,12 +103,15 @@ namespace Runtime.Localization
 
                 _store.SetActiveLocale(locale);
                 _currentLocale.Value = locale;
+                _reportedMissingKeys.Clear();
 
                 _isInitialized = true;
             }
             finally
             {
-                ExitBusy();
+                if (enteredBusy)
+                    ExitBusy();
+                _initializeGate.Release();
             }
         }
 
@@ -118,12 +132,16 @@ namespace Runtime.Localization
             }
 
             CancellationTokenSource linkedCts;
+            int myVersion;
             
             lock (_switchLock)
             {
                 _switchCts?.Cancel();
                 _switchCts?.Dispose();
                 _switchCts = new CancellationTokenSource();
+
+                _switchVersion++;
+                myVersion = _switchVersion;
 
                 linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _switchCts.Token);
             }
@@ -134,12 +152,33 @@ namespace Runtime.Localization
             {
                 await PreloadAsync(locale, _catalog.GetStartupTables(), linkedCts.Token);
 
+                lock (_switchLock)
+                {
+                    if (myVersion != _switchVersion)
+                        return;
+                }
+
                 _store.SetActiveLocale(locale);
                 _currentLocale.Value = locale;
+                _reportedMissingKeys.Clear();
 
                 try
                 {
-                    await _localeStorage.SaveAsync(locale);
+                    await _saveGate.WaitAsync(cancellationToken);
+                    try
+                    {
+                        lock (_switchLock)
+                        {
+                            if (myVersion != _switchVersion)
+                                return;
+                        }
+
+                        await _localeStorage.SaveAsync(locale);
+                    }
+                    finally
+                    {
+                        _saveGate.Release();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -206,12 +245,20 @@ namespace Runtime.Localization
                 return _formatter.Format(template, activeLocale, args);
             }
 
-            _errors.OnNext(new LocalizationError(
-                LocalizationErrorCode.MissingKey,
-                $"Missing key '{key.Value}' in table '{table.Name}'.",
-                locale: _store.GetActiveLocale(),
-                tableId: table,
-                key: key));
+            var locale = _store.GetActiveLocale();
+
+            if (_reportedMissingKeys.Count >= _maxReportedMissingKeys)
+                _reportedMissingKeys.Clear();
+
+            if (_reportedMissingKeys.Add(new MissingKeyReportKey(locale, table, key)))
+            {
+                _errors.OnNext(new LocalizationError(
+                    LocalizationErrorCode.MissingKey,
+                    $"Missing key '{key.Value}' in table '{table.Name}'.",
+                    locale: locale,
+                    tableId: table,
+                    key: key));
+            }
 
             if (_policy.UseMissingKeyPlaceholders) 
                 return $"⟦Missing: {table.Name}.{key.Value}⟧";
@@ -230,19 +277,38 @@ namespace Runtime.Localization
             {
                 IReadOnlyDictionary<string, object> latestArgs = null;
 
+                string lastEmitted = null;
+                var isDisposed = 0;
+
+                void Emit()
+                {
+                    if (Volatile.Read(ref isDisposed) != 0)
+                        return;
+
+                    var text = Resolve(table, key, latestArgs);
+                    if (string.Equals(text, lastEmitted, StringComparison.Ordinal))
+                        return;
+
+                    lastEmitted = text;
+                    observer.OnNext(text);
+                }
+
                 var argsSub = args.Subscribe(a =>
                 {
                     latestArgs = a;
-                    observer.OnNext(Resolve(table, key, latestArgs));
+                    Emit();
                 });
 
                 var localeSub = CurrentLocale.Subscribe(_ =>
                 {
-                    observer.OnNext(Resolve(table, key, latestArgs));
+                    Emit();
                 });
+
+                Emit();
 
                 return Disposable.Create(() =>
                 {
+                    Interlocked.Exchange(ref isDisposed, 1);
                     argsSub.Dispose();
                     localeSub.Dispose();
                 });
@@ -255,8 +321,15 @@ namespace Runtime.Localization
 
             return Observable.Create<string>(observer =>
             {
-                var localeSub = CurrentLocale.Subscribe(_ =>
+                observer.OnNext(Resolve(table, key, args));
+
+                var lastLocale = CurrentLocale.CurrentValue;
+                var localeSub = CurrentLocale.Subscribe(newLocale =>
                 {
+                    if (newLocale == lastLocale)
+                        return;
+
+                    lastLocale = newLocale;
                     observer.OnNext(Resolve(table, key, args));
                 });
 
@@ -276,6 +349,38 @@ namespace Runtime.Localization
             _errors.Dispose();
             _currentLocale.Dispose();
             _isBusy.Dispose();
+            _initializeGate.Dispose();
+            _saveGate.Dispose();
+        }
+
+        private readonly struct MissingKeyReportKey : IEquatable<MissingKeyReportKey>
+        {
+            private readonly LocaleId _locale;
+            private readonly TextTableId _table;
+            private readonly TextKey _key;
+
+            public MissingKeyReportKey(LocaleId locale, TextTableId table, TextKey key)
+            {
+                _locale = locale;
+                _table = table;
+                _key = key;
+            }
+
+            public bool Equals(MissingKeyReportKey other)
+                => _locale == other._locale && _table == other._table && _key == other._key;
+
+            public override bool Equals(object obj) => obj is MissingKeyReportKey other && Equals(other);
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    var hash = _locale.GetHashCode();
+                    hash = (hash * 397) ^ _table.GetHashCode();
+                    hash = (hash * 397) ^ _key.GetHashCode();
+                    return hash;
+                }
+            }
         }
 
         private static bool IsSupported(IReadOnlyList<LocaleId> supported, LocaleId locale)

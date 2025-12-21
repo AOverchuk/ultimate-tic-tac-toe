@@ -66,7 +66,7 @@ namespace Runtime.UI.Core
 
                 if (!typeof(VisualElement).IsAssignableFrom(field.FieldType))
                 {
-                    Log.Warning(LogTags.UI, $"[UxmlBinder] Field {field.Name} in {type.Name} has UxmlElement attribute but is not a VisualElement type!");
+                    UnityEngine.Debug.LogWarning($"[UxmlBinder] Field {field.Name} in {type.Name} has UxmlElement attribute but is not a VisualElement type!");
                     continue;
                 }
 

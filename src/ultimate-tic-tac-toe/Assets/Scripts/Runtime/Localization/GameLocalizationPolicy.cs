@@ -10,6 +10,8 @@ namespace Runtime.Localization
             LocaleId.EnglishUs,
         };
 
+        private readonly Dictionary<LocaleId, LocaleId[]> _fallbackChainCache = new();
+
         public bool UseMissingKeyPlaceholders { get; }
         public int MaxCachedTables { get; }
         public LocaleId DefaultLocale { get; }
@@ -29,25 +31,26 @@ namespace Runtime.Localization
 
         public IReadOnlyList<LocaleId> GetFallbackChain(LocaleId requested)
         {
+            if (_fallbackChainCache.TryGetValue(requested, out var cached))
+                return cached;
+
             var result = new List<LocaleId>(capacity: 4);
             AppendUnique(result, requested);
 
             if (requested.TryGetLanguageOnly(out var languageOnly))
             {
-                if (languageOnly != requested) 
+                if (languageOnly != requested)
                     AppendUnique(result, languageOnly);
             }
 
-            // Ensure default locale is always last fallback.
             AppendUnique(result, DefaultLocale);
 
-            // Safety net in case DefaultLocale is invalid.
-            foreach (var fallback in _defaultFallback)
-            {
-                AppendUnique(result, fallback);
-            }
+            for (var i = 0; i < _defaultFallback.Length; i++)
+                AppendUnique(result, _defaultFallback[i]);
 
-            return result;
+            var chain = result.ToArray();
+            _fallbackChainCache[requested] = chain;
+            return chain;
         }
 
         private static void AppendUnique(List<LocaleId> list, LocaleId locale)
