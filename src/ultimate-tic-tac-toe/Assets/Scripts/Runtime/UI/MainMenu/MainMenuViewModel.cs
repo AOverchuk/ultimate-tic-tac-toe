@@ -1,13 +1,15 @@
 using R3;
+using Runtime.Localization;
 using Runtime.UI.Core;
 
 namespace Runtime.UI.MainMenu
 {
     public class MainMenuViewModel : BaseViewModel
     {
-        private readonly ReactiveProperty<string> _title = new("Ultimate Tic-Tac-Toe");
-        private readonly ReactiveProperty<string> _startButtonText = new("Start Game");
-        private readonly ReactiveProperty<string> _exitButtonText = new("Exit");
+        private readonly ILocalizationService _localization;
+        private readonly ReactiveProperty<string> _title = new();
+        private readonly ReactiveProperty<string> _startButtonText = new();
+        private readonly ReactiveProperty<string> _exitButtonText = new();
         private readonly ReactiveProperty<bool> _isInteractable = new(true);
         private readonly Subject<Unit> _startGameRequested = new();
         private readonly Subject<Unit> _exitRequested = new();
@@ -18,6 +20,24 @@ namespace Runtime.UI.MainMenu
         public ReadOnlyReactiveProperty<bool> IsInteractable => _isInteractable;
         public Observable<Unit> StartGameRequested => _startGameRequested;
         public Observable<Unit> ExitRequested => _exitRequested;
+
+        public MainMenuViewModel(ILocalizationService localization) => 
+            _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
+
+        public override void Initialize()
+        {
+            AddDisposable(_localization
+                .Observe(TextTableId.UI, new TextKey("MainMenu.Title"))
+                .Subscribe(text => _title.Value = text));
+
+            AddDisposable(_localization
+                .Observe(TextTableId.UI, new TextKey("MainMenu.StartButton"))
+                .Subscribe(text => _startButtonText.Value = text));
+
+            AddDisposable(_localization
+                .Observe(TextTableId.UI, new TextKey("MainMenu.ExitButton"))
+                .Subscribe(text => _exitButtonText.Value = text));
+        }
 
         public void SetInteractable(bool isInteractable) => _isInteractable.Value = isInteractable;
 

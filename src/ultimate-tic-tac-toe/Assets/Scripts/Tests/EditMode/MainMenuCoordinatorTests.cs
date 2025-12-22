@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -8,6 +9,7 @@ using NUnit.Framework;
 using R3;
 using Runtime.Infrastructure.GameStateMachine;
 using Runtime.Infrastructure.GameStateMachine.States;
+using Runtime.Localization;
 using Runtime.UI.MainMenu;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -19,6 +21,7 @@ namespace Tests.EditMode
     {
         private MainMenuCoordinator _coordinator;
         private IGameStateMachine _stateMachineMock;
+        private ILocalizationService _localizationMock;
         private MainMenuViewModel _viewModel;
         private CancellationToken _cancellationToken;
 
@@ -26,8 +29,13 @@ namespace Tests.EditMode
         public void SetUp()
         {
             _stateMachineMock = Substitute.For<IGameStateMachine>();
+            _localizationMock = Substitute.For<ILocalizationService>();
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Any<TextKey>(), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Test"));
+            
             _coordinator = new MainMenuCoordinator(_stateMachineMock);
-            _viewModel = new MainMenuViewModel();
+            _viewModel = new MainMenuViewModel(_localizationMock);
+            _viewModel.Initialize();
             _cancellationToken = CancellationToken.None;
 
             _stateMachineMock.EnterAsync<LoadGameplayState>(Arg.Any<CancellationToken>())
@@ -140,8 +148,10 @@ namespace Tests.EditMode
         public async Task WhenInitializeCalledTwice_ThenOldSubscriptionsDisposed()
         {
             // Arrange
-            var viewModel1 = new MainMenuViewModel();
-            var viewModel2 = new MainMenuViewModel();
+            var viewModel1 = new MainMenuViewModel(_localizationMock);
+            viewModel1.Initialize();
+            var viewModel2 = new MainMenuViewModel(_localizationMock);
+            viewModel2.Initialize();
 
             _coordinator.Initialize(viewModel1);
 

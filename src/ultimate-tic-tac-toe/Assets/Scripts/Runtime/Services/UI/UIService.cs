@@ -18,16 +18,10 @@ namespace Runtime.Services.UI
         private readonly Dictionary<Type, GameObject> _windowPrefabs = new();
         private readonly Dictionary<Type, IDisposable> _closeSubscriptions = new();
 
-        public UIService(IObjectResolver container)
+        public UIService(UIPoolManager poolManager, ViewModelFactory viewModelFactory)
         {
-            _viewModelFactory = new ViewModelFactory(container);
-            _poolManager = new UIPoolManager(container);
-        }
-
-        internal UIService(IObjectResolver container, UIPoolManager poolManager, ViewModelFactory viewModelFactory)
-        {
-            _poolManager = poolManager;
-            _viewModelFactory = viewModelFactory;
+            _poolManager = poolManager ?? throw new ArgumentNullException(nameof(poolManager));
+            _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
         }
 
         public void RegisterWindowPrefab<TWindow>(GameObject prefab) where TWindow : class, IUIView

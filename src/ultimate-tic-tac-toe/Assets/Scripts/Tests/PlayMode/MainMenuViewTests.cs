@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using FluentAssertions;
+using NSubstitute;
 using NUnit.Framework;
 using R3;
+using Runtime.Localization;
 using Runtime.UI.MainMenu;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -18,6 +22,7 @@ namespace Tests.PlayMode
         private UIDocument _uiDocument;
         private MainMenuView _view;
         private MainMenuViewModel _viewModel;
+        private ILocalizationService _localizationMock;
         private VisualTreeAsset _mainMenuUxml;
 
         [OneTimeSetUp]
@@ -32,11 +37,22 @@ namespace Tests.PlayMode
         [UnitySetUp]
         public IEnumerator Setup()
         {
+            _localizationMock = Substitute.For<ILocalizationService>();
+            
+            // Setup mock to return correct values based on key
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Is<TextKey>(k => k.Value == "MainMenu.Title"), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Ultimate Tic-Tac-Toe"));
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Is<TextKey>(k => k.Value == "MainMenu.StartButton"), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Start Game"));
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Is<TextKey>(k => k.Value == "MainMenu.ExitButton"), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Exit"));
+            
             _gameObject = new GameObject("MainMenuViewTestObject");
             _uiDocument = _gameObject.AddComponent<UIDocument>();
             _uiDocument.visualTreeAsset = _mainMenuUxml;
             _view = _gameObject.AddComponent<MainMenuView>();
-            _viewModel = new MainMenuViewModel();
+            _viewModel = new MainMenuViewModel(_localizationMock);
+            _viewModel.Initialize();
 
             yield return null;
 

@@ -27,7 +27,6 @@ namespace Runtime.UI.Core
 
         public void ClearViewModel()
         {
-            ViewModel?.Dispose();
             ViewModel = null;
             _disposables.Clear();
             _isInitialized = false;

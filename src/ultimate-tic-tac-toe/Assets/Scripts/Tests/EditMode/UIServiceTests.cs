@@ -32,7 +32,7 @@ namespace Tests.EditMode
             _mockViewModelPool = Substitute.For<IObjectPool<BaseViewModel>>();
             _poolManager = new UIPoolManager(_mockContainer, _mockWindowPool, _mockViewModelPool);
             _viewModelFactory = new ViewModelFactory(_mockContainer);
-            _uiService = new UIService(_mockContainer, _poolManager, _viewModelFactory);
+            _uiService = new UIService(_poolManager, _viewModelFactory);
             _createdPrefabs = new List<GameObject>();
         }
 

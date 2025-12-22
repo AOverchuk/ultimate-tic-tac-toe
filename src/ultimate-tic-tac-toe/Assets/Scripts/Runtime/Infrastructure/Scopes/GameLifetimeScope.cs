@@ -1,6 +1,7 @@
 using Runtime.Infrastructure.EntryPoint;
 using Runtime.Infrastructure.GameStateMachine;
 using Runtime.Infrastructure.GameStateMachine.States;
+using Runtime.Localization;
 using Runtime.Services.Assets;
 using Runtime.Services.Scenes;
 using Runtime.Services.UI;
@@ -14,17 +15,17 @@ namespace Runtime.Infrastructure.Scopes
 {
     public class GameLifetimeScope : LifetimeScope
     {
-        [SerializeField] private AssetLibrary AssetLibrary;
+        [SerializeField] private AssetLibrary _assetLibrary;
 
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<GameEntryPoint>();
 
-            if (AssetLibrary == null)
+            if (_assetLibrary == null)
                 throw new System.InvalidOperationException("AssetLibrary is not assigned in GameLifetimeScope.");
             
             // Services
-            builder.RegisterInstance(AssetLibrary);
+            builder.RegisterInstance(_assetLibrary);
             builder.Register<IAssetProvider, AddressablesAssetProvider>(Lifetime.Singleton);
             builder.Register<ISceneLoaderService, SceneLoaderService>(Lifetime.Singleton);
             builder.Register<ViewModelFactory>(Lifetime.Singleton);
@@ -32,6 +33,16 @@ namespace Runtime.Infrastructure.Scopes
             builder.Register<ObjectPool<IUIView>>(Lifetime.Singleton).As<IObjectPool<IUIView>>();
             builder.Register<ObjectPool<BaseViewModel>>(Lifetime.Singleton).As<IObjectPool<BaseViewModel>>();
             builder.Register<IUIService, UIService>(Lifetime.Singleton);
+            
+            // Localization Services
+            builder.Register<ILocalizationPolicy, GameLocalizationPolicy>(Lifetime.Singleton);
+            builder.Register<ILocaleStorage, PlayerPrefsLocaleStorage>(Lifetime.Singleton);
+            builder.Register<ILocalizationCatalog, AddressablesLocalizationCatalog>(Lifetime.Singleton);
+            builder.Register<ILocalizationLoader, AddressablesLocalizationLoader>(Lifetime.Singleton);
+            builder.Register<ILocalizationParser, JsonLocalizationParser>(Lifetime.Singleton);
+            builder.Register<ILocalizationStore, LocalizationStore>(Lifetime.Singleton);
+            builder.Register<ITextFormatter, NamedArgsFormatter>(Lifetime.Singleton);
+            builder.Register<ILocalizationService, LocalizationService>(Lifetime.Singleton);
         
             // State Machine
             builder.Register<IStateFactory, StateFactory>(Lifetime.Singleton);

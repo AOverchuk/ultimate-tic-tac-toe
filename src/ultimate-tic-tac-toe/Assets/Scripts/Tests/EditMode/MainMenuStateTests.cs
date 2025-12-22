@@ -1,12 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using R3;
 using Runtime.Infrastructure.GameStateMachine.States;
+using Runtime.Localization;
 using Runtime.Services.Assets;
 using Runtime.Services.UI;
 using Runtime.UI.MainMenu;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.TestTools;
@@ -20,6 +23,7 @@ namespace Tests.EditMode
         private IUIService _uiService;
         private IMainMenuCoordinator _coordinator;
         private IAssetProvider _assets;
+        private ILocalizationService _localizationMock;
         private AssetLibrary _assetLibrary;
         private MainMenuState _state;
         private GameObject _viewGameObject;
@@ -33,7 +37,12 @@ namespace Tests.EditMode
             _uiService = Substitute.For<IUIService>();
             _coordinator = Substitute.For<IMainMenuCoordinator>();
             _assets = Substitute.For<IAssetProvider>();
-            _viewModel = new MainMenuViewModel();
+            _localizationMock = Substitute.For<ILocalizationService>();
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Any<TextKey>(), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Test"));
+            
+            _viewModel = new MainMenuViewModel(_localizationMock);
+            _viewModel.Initialize();
 
             _assetLibrary = ScriptableObject.CreateInstance<AssetLibrary>();
             _assetLibrary.MainMenuPrefab = new AssetReferenceGameObject("00000000000000000000000000000000");

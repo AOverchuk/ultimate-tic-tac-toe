@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using FluentAssertions;
+using NSubstitute;
 using NUnit.Framework;
 using R3;
+using Runtime.Localization;
 using Runtime.UI.MainMenu;
 
 namespace Tests.EditMode.UI.MainMenu
@@ -9,11 +13,28 @@ namespace Tests.EditMode.UI.MainMenu
     [TestFixture]
     public class MainMenuViewModelTests
     {
+        private ILocalizationService _localizationMock;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _localizationMock = Substitute.For<ILocalizationService>();
+            
+            // Setup mock to return correct values based on key
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Is<TextKey>(k => k.Value == "MainMenu.Title"), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Ultimate Tic-Tac-Toe"));
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Is<TextKey>(k => k.Value == "MainMenu.StartButton"), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Start Game"));
+            _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Is<TextKey>(k => k.Value == "MainMenu.ExitButton"), Arg.Any<IReadOnlyDictionary<string, object>>())
+                .Returns(Observable.Return("Exit"));
+        }
+
         [Test]
         public void WhenInitialized_ThenHasCorrectDefaults()
         {
             // Arrange
-            var sut = new MainMenuViewModel();
+            var sut = new MainMenuViewModel(_localizationMock);
+            sut.Initialize();
 
             // Assert
             sut.Title.CurrentValue.Should().Be("Ultimate Tic-Tac-Toe");
@@ -28,7 +49,8 @@ namespace Tests.EditMode.UI.MainMenu
         public void WhenSetInteractable_ThenUpdatesIsInteractable()
         {
             // Arrange
-            var sut = new MainMenuViewModel();
+            var sut = new MainMenuViewModel(_localizationMock);
+            sut.Initialize();
 
             // Act
             sut.SetInteractable(false);
@@ -47,7 +69,8 @@ namespace Tests.EditMode.UI.MainMenu
         public void WhenDisposed_ThenObservablesThrowObjectDisposedException()
         {
             // Arrange
-            var sut = new MainMenuViewModel();
+            var sut = new MainMenuViewModel(_localizationMock);
+            sut.Initialize();
             var valueEmitted = false;
             sut.StartGameRequested.Subscribe(_ => valueEmitted = true);
 
@@ -69,7 +92,8 @@ namespace Tests.EditMode.UI.MainMenu
         public void WhenDisposedMultipleTimes_ThenDoesNotThrow()
         {
             // Arrange
-            var sut = new MainMenuViewModel();
+            var sut = new MainMenuViewModel(_localizationMock);
+            sut.Initialize();
 
             // Act
             sut.Dispose();
