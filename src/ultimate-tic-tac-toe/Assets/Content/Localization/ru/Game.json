@@ -1,0 +1,14 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Game",
+  "entries": {
+    "Game.OpponentTurn": "Ход игрока {playerName}",
+    "Game.Pause": "Пауза",
+    "Game.Resume": "Продолжить",
+    "Game.Score": "Счёт: {score}",
+    "Game.Surrender": "Сдаться",
+    "Game.Timer": "Время: {seconds}с",
+    "Game.YourTurn": "Ваш ход"
+  }
+}

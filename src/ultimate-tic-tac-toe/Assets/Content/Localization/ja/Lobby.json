@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Lobby",
+  "entries": {
+    "Lobby.Cancel": "キャンセル",
+    "Lobby.PlayerJoined": "{playerName}が参加しました",
+    "Lobby.PlayerLeft": "{playerName}が退出しました",
+    "Lobby.Ready": "準備完了",
+    "Lobby.WaitingForPlayers": "プレイヤーを待っています..."
+  }
+}

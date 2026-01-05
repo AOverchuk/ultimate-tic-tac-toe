@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Mode",
+  "entries": {
+    "Mode.Blitz": "ブリッツモード",
+    "Mode.Classic": "クラシックモード",
+    "Mode.Description.Blitz": "時間制限付きの高速ゲーム",
+    "Mode.Description.Classic": "標準的な○×ゲーム",
+    "Mode.Description.Ultimate": "○×ゲームの中の○×ゲーム",
+    "Mode.Ultimate": "アルティメットモード"
+  }
+}

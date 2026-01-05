@@ -1,0 +1,14 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Game",
+  "entries": {
+    "Game.OpponentTurn": "{playerName}のターン",
+    "Game.Pause": "一時停止",
+    "Game.Resume": "再開",
+    "Game.Score": "スコア: {score}",
+    "Game.Surrender": "降参",
+    "Game.Timer": "時間: {seconds}秒",
+    "Game.YourTurn": "あなたのターン"
+  }
+}

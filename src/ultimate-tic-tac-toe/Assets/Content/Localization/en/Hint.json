@@ -1,0 +1,10 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Hint",
+  "entries": {
+    "Hint.FirstMove": "Make your first move!",
+    "Hint.FollowRules": "Follow the board rules",
+    "Hint.WatchTimer": "Watch the timer!"
+  }
+}

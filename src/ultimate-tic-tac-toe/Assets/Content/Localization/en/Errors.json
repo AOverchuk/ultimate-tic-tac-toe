@@ -1,0 +1,29 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Errors",
+  "entries": {
+    "Errors.Auth.InvalidCredentials": "Invalid credentials",
+    "Errors.Auth.LoginFailed": "Login failed",
+    "Errors.Auth.SessionExpired": "Session expired",
+    "Errors.Game.GameEnded": "Game has ended",
+    "Errors.Game.InvalidMove": "Invalid move",
+    "Errors.Game.NotYourTurn": "It's not your turn",
+    "Errors.Game.PlayerNotFound": "Player not found",
+    "Errors.Lobby.AlreadyInRoom": "Already in a room",
+    "Errors.Lobby.CreateRoomFailed": "Failed to create room",
+    "Errors.Lobby.JoinRoomFailed": "Failed to join room",
+    "Errors.Lobby.RoomFull": "Room is full",
+    "Errors.Lobby.RoomNotFound": "Room not found",
+    "Errors.Localization.KeyNotFound": "Text not found: {key}",
+    "Errors.Localization.LoadFailed": "Failed to load localization: {locale}",
+    "Errors.Network.ConnectionFailed": "Connection failed",
+    "Errors.Network.ConnectionLost": "Connection lost",
+    "Errors.Network.ServerError": "Server error",
+    "Errors.Network.Timeout": "Connection timeout",
+    "Errors.Network.UnknownError": "Unknown network error",
+    "Errors.System.FileNotFound": "File not found: {fileName}",
+    "Errors.System.OutOfMemory": "Out of memory",
+    "Errors.System.PermissionDenied": "Permission denied"
+  }
+}

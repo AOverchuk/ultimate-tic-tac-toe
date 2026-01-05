@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "GameOver",
+  "entries": {
+    "GameOver.Defeat": "敗北",
+    "GameOver.Draw": "引き分け",
+    "GameOver.MainMenu": "メインメニュー",
+    "GameOver.Rematch": "再戦",
+    "GameOver.Victory": "勝利！"
+  }
+}

@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "MainMenu",
+  "entries": {
+    "MainMenu.CreateRoom": "Создать комнату",
+    "MainMenu.Exit": "Выход",
+    "MainMenu.ExitButton": "Выход",
+    "MainMenu.JoinRoom": "Присоединиться",
+    "MainMenu.Play": "Играть",
+    "MainMenu.QuickMatch": "Быстрая игра",
+    "MainMenu.Settings": "Настройки",
+    "MainMenu.StartButton": "Играть",
+    "MainMenu.Title": "Ультимативные крестики-нолики"
+  }
+}

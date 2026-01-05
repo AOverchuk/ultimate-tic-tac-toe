@@ -1,0 +1,11 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Stats",
+  "entries": {
+    "Stats.Draws": "引き分け数: {draws}",
+    "Stats.Losses": "敗北数: {losses}",
+    "Stats.WinRate": "勝率: {rate}%",
+    "Stats.Wins": "勝利数: {wins}"
+  }
+}

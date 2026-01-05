@@ -1,0 +1,29 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Errors",
+  "entries": {
+    "Errors.Auth.InvalidCredentials": "無効な認証情報",
+    "Errors.Auth.LoginFailed": "ログインに失敗しました",
+    "Errors.Auth.SessionExpired": "セッションが期限切れです",
+    "Errors.Game.GameEnded": "ゲームは終了しました",
+    "Errors.Game.InvalidMove": "無効な手",
+    "Errors.Game.NotYourTurn": "あなたのターンではありません",
+    "Errors.Game.PlayerNotFound": "プレイヤーが見つかりません",
+    "Errors.Lobby.AlreadyInRoom": "すでにルームに参加しています",
+    "Errors.Lobby.CreateRoomFailed": "ルームの作成に失敗しました",
+    "Errors.Lobby.JoinRoomFailed": "ルームへの参加に失敗しました",
+    "Errors.Lobby.RoomFull": "ルームが満員です",
+    "Errors.Lobby.RoomNotFound": "ルームが見つかりません",
+    "Errors.Localization.KeyNotFound": "テキストが見つかりません: {key}",
+    "Errors.Localization.LoadFailed": "ローカライゼーションの読み込みに失敗しました: {locale}",
+    "Errors.Network.ConnectionFailed": "接続に失敗しました",
+    "Errors.Network.ConnectionLost": "接続が切れました",
+    "Errors.Network.ServerError": "サーバーエラー",
+    "Errors.Network.Timeout": "接続タイムアウト",
+    "Errors.Network.UnknownError": "不明なネットワークエラー",
+    "Errors.System.FileNotFound": "ファイルが見つかりません: {fileName}",
+    "Errors.System.OutOfMemory": "メモリ不足",
+    "Errors.System.PermissionDenied": "アクセス拒否"
+  }
+}

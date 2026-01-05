@@ -1,0 +1,9 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Turn",
+  "entries": {
+    "Turn.TimeRemaining": "{seconds}s remaining",
+    "Turn.Timeout": "Turn timeout!"
+  }
+}

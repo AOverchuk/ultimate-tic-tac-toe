@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Mode",
+  "entries": {
+    "Mode.Blitz": "Blitz Mode",
+    "Mode.Classic": "Classic Mode",
+    "Mode.Description.Blitz": "Fast-paced with time limits",
+    "Mode.Description.Classic": "Standard Tic-Tac-Toe",
+    "Mode.Description.Ultimate": "Tic-Tac-Toe within Tic-Tac-Toe",
+    "Mode.Ultimate": "Ultimate Mode"
+  }
+}

@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Player",
+  "entries": {
+    "Player.Disconnected": "対戦相手が切断されました",
+    "Player.O": "○",
+    "Player.Reconnecting": "対戦相手が再接続中...",
+    "Player.Waiting": "対戦相手を待っています...",
+    "Player.X": "×"
+  }
+}

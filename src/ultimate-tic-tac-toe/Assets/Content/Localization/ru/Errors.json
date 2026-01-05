@@ -1,0 +1,29 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Errors",
+  "entries": {
+    "Errors.Auth.InvalidCredentials": "Неверные учётные данные",
+    "Errors.Auth.LoginFailed": "Ошибка входа",
+    "Errors.Auth.SessionExpired": "Сессия истекла",
+    "Errors.Game.GameEnded": "Игра завершена",
+    "Errors.Game.InvalidMove": "Недопустимый ход",
+    "Errors.Game.NotYourTurn": "Сейчас не ваш ход",
+    "Errors.Game.PlayerNotFound": "Игрок не найден",
+    "Errors.Lobby.AlreadyInRoom": "Вы уже в комнате",
+    "Errors.Lobby.CreateRoomFailed": "Не удалось создать комнату",
+    "Errors.Lobby.JoinRoomFailed": "Не удалось присоединиться",
+    "Errors.Lobby.RoomFull": "Комната заполнена",
+    "Errors.Lobby.RoomNotFound": "Комната не найдена",
+    "Errors.Localization.KeyNotFound": "Текст не найден: {key}",
+    "Errors.Localization.LoadFailed": "Не удалось загрузить локализацию: {locale}",
+    "Errors.Network.ConnectionFailed": "Ошибка подключения",
+    "Errors.Network.ConnectionLost": "Соединение потеряно",
+    "Errors.Network.ServerError": "Ошибка сервера",
+    "Errors.Network.Timeout": "Превышено время ожидания",
+    "Errors.Network.UnknownError": "Неизвестная сетевая ошибка",
+    "Errors.System.FileNotFound": "Файл не найден: {fileName}",
+    "Errors.System.OutOfMemory": "Недостаточно памяти",
+    "Errors.System.PermissionDenied": "Доступ запрещён"
+  }
+}

@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Common",
+  "entries": {
+    "Common.Cancel": "Отмена",
+    "Common.Connecting": "Подключение...",
+    "Common.Loading": "Загрузка...",
+    "Common.No": "Нет",
+    "Common.Ok": "ОК",
+    "Common.Yes": "Да"
+  }
+}

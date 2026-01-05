@@ -1,0 +1,9 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Turn",
+  "entries": {
+    "Turn.TimeRemaining": "Осталось {seconds}с",
+    "Turn.Timeout": "Время хода истекло!"
+  }
+}

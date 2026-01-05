@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Player",
+  "entries": {
+    "Player.Disconnected": "Противник отключился",
+    "Player.O": "O",
+    "Player.Reconnecting": "Противник переподключается...",
+    "Player.Waiting": "Ожидание противника...",
+    "Player.X": "X"
+  }
+}

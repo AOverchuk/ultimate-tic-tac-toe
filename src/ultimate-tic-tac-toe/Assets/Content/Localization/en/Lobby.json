@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Lobby",
+  "entries": {
+    "Lobby.Cancel": "Cancel",
+    "Lobby.PlayerJoined": "{playerName} joined",
+    "Lobby.PlayerLeft": "{playerName} left",
+    "Lobby.Ready": "Ready",
+    "Lobby.WaitingForPlayers": "Waiting for players..."
+  }
+}

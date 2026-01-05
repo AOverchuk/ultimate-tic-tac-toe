@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Localization_ru
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Localization_ru
+  m_GUID: 8e7d708775c7e244d96c4515c56b31ce
+  m_SerializeEntries:
+  - m_GUID: 0632fb91ec191d9418aa9f57dd76d818
+    m_Address: loc_ru_board
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b2d0bb39e7e9b24b9d7752c6ac8c969
+    m_Address: loc_ru_lobby
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0de92e160040104488f702bb723f5162
+    m_Address: loc_ru_settings
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 46c3c984301ec024896938d820574ae8
+    m_Address: loc_ru_common
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5f7616fb5facc96449959781607fb025
+    m_Address: loc_ru_stats
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75bbf59b01bd9ac4d85d900e9b45008c
+    m_Address: loc_ru_game
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80a1ece8998268a4fb3bb0c8fb306d55
+    m_Address: loc_ru_hint
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8288cb3c36b6d9a4cb6eb58379561160
+    m_Address: loc_ru_turn
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 846e90986c6c7d74d99c1bbef875e15e
+    m_Address: loc_ru_gameover
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8501c2032fe4b5e4c8e872325f8552a0
+    m_Address: loc_ru_player
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c2913e488a9a664896a6c758b79f71e
+    m_Address: loc_ru_gameplay
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b5ea00a60b2343247b7d72172df06ea8
+    m_Address: loc_ru_mode
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b747663db495c4745bf6a39919f217cf
+    m_Address: loc_ru_mainmenu
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d01435f7ba7b3654ab5cae8aaedf1a7b
+    m_Address: loc_ru_ui
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d4370d6bf495b80448098fe97b79969a
+    m_Address: loc_ru_errors
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: c0f3088e8bfb29e43acd1eafbe5e59a5, type: 2}
+  m_SchemaSet:
+    m_Schemas: []

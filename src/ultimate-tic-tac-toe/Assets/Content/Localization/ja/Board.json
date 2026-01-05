@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Board",
+  "entries": {
+    "Board.AnyBoardAvailable": "利用可能な任意のボードでプレイ",
+    "Board.InvalidMove": "無効な手",
+    "Board.LocalBoardDraw": "ローカルボード引き分け",
+    "Board.LocalBoardWon": "ローカルボード勝利！",
+    "Board.MustPlayInBoard": "ボード{boardIndex}でプレイする必要があります",
+    "Board.SelectCell": "マスを選択"
+  }
+}

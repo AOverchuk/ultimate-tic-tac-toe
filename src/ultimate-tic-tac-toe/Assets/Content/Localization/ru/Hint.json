@@ -1,0 +1,10 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Hint",
+  "entries": {
+    "Hint.FirstMove": "Сделайте первый ход!",
+    "Hint.FollowRules": "Следуйте правилам игры",
+    "Hint.WatchTimer": "Следите за таймером!"
+  }
+}

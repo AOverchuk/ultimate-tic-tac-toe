@@ -1,0 +1,11 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Stats",
+  "entries": {
+    "Stats.Draws": "Ничьих: {draws}",
+    "Stats.Losses": "Поражений: {losses}",
+    "Stats.WinRate": "Процент побед: {rate}%",
+    "Stats.Wins": "Побед: {wins}"
+  }
+}

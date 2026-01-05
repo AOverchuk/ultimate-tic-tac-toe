@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Player",
+  "entries": {
+    "Player.Disconnected": "Opponent disconnected",
+    "Player.O": "O",
+    "Player.Reconnecting": "Opponent reconnecting...",
+    "Player.Waiting": "Waiting for opponent...",
+    "Player.X": "X"
+  }
+}

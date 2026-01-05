@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Common",
+  "entries": {
+    "Common.Cancel": "Cancel",
+    "Common.Connecting": "Connecting...",
+    "Common.Loading": "Loading...",
+    "Common.No": "No",
+    "Common.Ok": "OK",
+    "Common.Yes": "Yes"
+  }
+}

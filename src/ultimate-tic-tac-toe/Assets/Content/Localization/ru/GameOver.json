@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "GameOver",
+  "entries": {
+    "GameOver.Defeat": "Поражение",
+    "GameOver.Draw": "Ничья",
+    "GameOver.MainMenu": "Главное меню",
+    "GameOver.Rematch": "Реванш",
+    "GameOver.Victory": "Победа!"
+  }
+}

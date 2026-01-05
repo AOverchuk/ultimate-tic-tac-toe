@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "GameOver",
+  "entries": {
+    "GameOver.Defeat": "Defeat",
+    "GameOver.Draw": "Draw",
+    "GameOver.MainMenu": "Main Menu",
+    "GameOver.Rematch": "Rematch",
+    "GameOver.Victory": "Victory!"
+  }
+}

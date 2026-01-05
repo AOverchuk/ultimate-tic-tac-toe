@@ -6,6 +6,7 @@ using Runtime.Infrastructure.Logging;
 using Runtime.Infrastructure.GameStateMachine;
 using Runtime.Infrastructure.GameStateMachine.States;
 using StripLog;
+using UnityEngine;
 
 namespace Runtime.UI.MainMenu
 {

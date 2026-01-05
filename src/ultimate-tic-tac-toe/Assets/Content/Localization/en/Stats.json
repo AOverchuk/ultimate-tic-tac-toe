@@ -1,0 +1,11 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Stats",
+  "entries": {
+    "Stats.Draws": "Draws: {draws}",
+    "Stats.Losses": "Losses: {losses}",
+    "Stats.WinRate": "Win Rate: {rate}%",
+    "Stats.Wins": "Wins: {wins}"
+  }
+}

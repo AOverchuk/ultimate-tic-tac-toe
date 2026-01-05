@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "MainMenu",
+  "entries": {
+    "MainMenu.CreateRoom": "ルームを作成",
+    "MainMenu.Exit": "終了",
+    "MainMenu.ExitButton": "終了",
+    "MainMenu.JoinRoom": "ルームに参加",
+    "MainMenu.Play": "プレイ",
+    "MainMenu.QuickMatch": "クイックマッチ",
+    "MainMenu.Settings": "設定",
+    "MainMenu.StartButton": "プレイ",
+    "MainMenu.Title": "究極の○×ゲーム"
+  }
+}

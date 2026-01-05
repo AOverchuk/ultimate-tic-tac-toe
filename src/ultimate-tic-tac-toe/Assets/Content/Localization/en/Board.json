@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Board",
+  "entries": {
+    "Board.AnyBoardAvailable": "Play in any available board",
+    "Board.InvalidMove": "Invalid move",
+    "Board.LocalBoardDraw": "Local board draw",
+    "Board.LocalBoardWon": "Local board won!",
+    "Board.MustPlayInBoard": "You must play in board {boardIndex}",
+    "Board.SelectCell": "Select a cell"
+  }
+}

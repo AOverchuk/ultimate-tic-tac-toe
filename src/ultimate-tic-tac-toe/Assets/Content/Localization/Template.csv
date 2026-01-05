@@ -1,0 +1,86 @@
+Key,en-US,ru-RU,ja-JP,Context
+MainMenu.Title,Ultimate Tic-Tac-Toe,Ультимативные крестики-нолики,究極の○×ゲーム,Main menu header
+MainMenu.Play,Play,Играть,プレイ,Start game button (legacy)
+MainMenu.StartButton,Play,Играть,プレイ,Start game button (current)
+MainMenu.Settings,Settings,Настройки,設定,Settings button
+MainMenu.Exit,Exit,Выход,終了,Exit button (legacy)
+MainMenu.ExitButton,Exit,Выход,終了,Exit button (current)
+MainMenu.CreateRoom,Create Room,Создать комнату,ルームを作成,Create room button
+MainMenu.JoinRoom,Join Room,Присоединиться,ルームに参加,Join room button
+MainMenu.QuickMatch,Quick Match,Быстрая игра,クイックマッチ,Quick match button
+Settings.Title,Settings,Настройки,設定,Settings screen title
+Settings.Language,Language,Язык,言語,Language selection label
+Settings.Audio,Audio,Звук,オーディオ,Audio settings label
+Settings.Volume,Volume: {volume}%,Громкость: {volume}%,音量: {volume}%,Volume display with placeholder
+Settings.Back,Back,Назад,戻る,Back button
+Game.YourTurn,Your Turn,Ваш ход,あなたのターン,Indicates player's turn
+Game.OpponentTurn,"{playerName}'s Turn",Ход игрока {playerName},{playerName}のターン,Indicates opponent's turn
+Game.Score,Score: {score},Счёт: {score},スコア: {score},Score display
+Game.Timer,Time: {seconds}s,Время: {seconds}с,時間: {seconds}秒,Timer display
+Game.Pause,Pause,Пауза,一時停止,Pause button
+Game.Resume,Resume,Продолжить,再開,Resume button
+Game.Surrender,Surrender,Сдаться,降参,Surrender button
+GameOver.Victory,Victory!,Победа!,勝利！,Victory message
+GameOver.Defeat,Defeat,Поражение,敗北,Defeat message
+GameOver.Draw,Draw,Ничья,引き分け,Draw message
+GameOver.Rematch,Rematch,Реванш,再戦,Rematch button
+GameOver.MainMenu,Main Menu,Главное меню,メインメニュー,Return to main menu
+Lobby.WaitingForPlayers,Waiting for players...,Ожидание игроков...,プレイヤーを待っています...,Waiting status
+Lobby.PlayerJoined,{playerName} joined,{playerName} присоединился,{playerName}が参加しました,Player joined notification
+Lobby.PlayerLeft,{playerName} left,{playerName} вышел,{playerName}が退出しました,Player left notification
+Lobby.Ready,Ready,Готов,準備完了,Ready button
+Lobby.Cancel,Cancel,Отмена,キャンセル,Cancel button
+Common.Loading,Loading...,Загрузка...,読み込み中...,Loading indicator
+Common.Connecting,Connecting...,Подключение...,接続中...,Connecting indicator
+Common.Yes,Yes,Да,はい,Confirmation
+Common.No,No,Нет,いいえ,Decline
+Common.Ok,OK,ОК,OK,Acknowledgment
+Common.Cancel,Cancel,Отмена,キャンセル,Cancel action
+Board.SelectCell,Select a cell,Выберите клетку,マスを選択,Instruction to select
+Board.InvalidMove,Invalid move,Недопустимый ход,無効な手,Invalid move error
+Board.LocalBoardWon,Local board won!,Локальное поле выиграно!,ローカルボード勝利！,Local board win message
+Board.LocalBoardDraw,Local board draw,Ничья на локальном поле,ローカルボード引き分け,Local board draw message
+Board.MustPlayInBoard,You must play in board {boardIndex},Вы должны сыграть на поле {boardIndex},ボード{boardIndex}でプレイする必要があります,Board restriction message
+Board.AnyBoardAvailable,Play in any available board,Играйте на любом доступном поле,利用可能な任意のボードでプレイ,Any board available message
+Turn.Timeout,Turn timeout!,Время хода истекло!,ターンタイムアウト！,Turn timeout message
+Turn.TimeRemaining,{seconds}s remaining,Осталось {seconds}с,残り{seconds}秒,Time remaining display
+Mode.Classic,Classic Mode,Классический режим,クラシックモード,Classic game mode
+Mode.Ultimate,Ultimate Mode,Ультимативный режим,アルティメットモード,Ultimate game mode
+Mode.Blitz,Blitz Mode,Блиц,ブリッツモード,Blitz game mode
+Mode.Description.Classic,Standard Tic-Tac-Toe,Стандартные крестики-нолики,標準的な○×ゲーム,Classic mode description
+Mode.Description.Ultimate,Tic-Tac-Toe within Tic-Tac-Toe,Крестики-нолики внутри крестиков-ноликов,○×ゲームの中の○×ゲーム,Ultimate mode description
+Mode.Description.Blitz,Fast-paced with time limits,Быстрая игра с ограничением времени,時間制限付きの高速ゲーム,Blitz mode description
+Player.X,X,X,×,Player X symbol
+Player.O,O,O,○,Player O symbol
+Player.Waiting,Waiting for opponent...,Ожидание противника...,対戦相手を待っています...,Waiting for opponent
+Player.Disconnected,Opponent disconnected,Противник отключился,対戦相手が切断されました,Opponent disconnected
+Player.Reconnecting,Opponent reconnecting...,Противник переподключается...,対戦相手が再接続中...,Opponent reconnecting
+Hint.FirstMove,Make your first move!,Сделайте первый ход!,最初の手を打ちましょう！,First move hint
+Hint.FollowRules,Follow the board rules,Следуйте правилам игры,ルールに従ってください,Rules reminder
+Hint.WatchTimer,Watch the timer!,Следите за таймером!,タイマーに注意！,Timer warning
+Stats.Wins,Wins: {wins},Побед: {wins},勝利数: {wins},Win count
+Stats.Losses,Losses: {losses},Поражений: {losses},敗北数: {losses},Loss count
+Stats.Draws,Draws: {draws},Ничьих: {draws},引き分け数: {draws},Draw count
+Stats.WinRate,Win Rate: {rate}%,Процент побед: {rate}%,勝率: {rate}%,Win rate percentage
+Errors.Network.ConnectionFailed,Connection failed,Ошибка подключения,接続に失敗しました,Connection error
+Errors.Network.ConnectionLost,Connection lost,Соединение потеряно,接続が切れました,Connection lost
+Errors.Network.Timeout,Connection timeout,Превышено время ожидания,接続タイムアウト,Connection timeout
+Errors.Network.ServerError,Server error,Ошибка сервера,サーバーエラー,Server error
+Errors.Network.UnknownError,Unknown network error,Неизвестная сетевая ошибка,不明なネットワークエラー,Unknown network error
+Errors.Game.InvalidMove,Invalid move,Недопустимый ход,無効な手,Invalid move
+Errors.Game.NotYourTurn,"It's not your turn",Сейчас не ваш ход,あなたのターンではありません,Not your turn
+Errors.Game.GameEnded,Game has ended,Игра завершена,ゲームは終了しました,Game ended
+Errors.Game.PlayerNotFound,Player not found,Игрок не найден,プレイヤーが見つかりません,Player not found
+Errors.Lobby.RoomFull,Room is full,Комната заполнена,ルームが満員です,Room full
+Errors.Lobby.RoomNotFound,Room not found,Комната не найдена,ルームが見つかりません,Room not found
+Errors.Lobby.AlreadyInRoom,Already in a room,Вы уже в комнате,すでにルームに参加しています,Already in room
+Errors.Lobby.CreateRoomFailed,Failed to create room,Не удалось создать комнату,ルームの作成に失敗しました,Create room failed
+Errors.Lobby.JoinRoomFailed,Failed to join room,Не удалось присоединиться,ルームへの参加に失敗しました,Join room failed
+Errors.Auth.LoginFailed,Login failed,Ошибка входа,ログインに失敗しました,Login failed
+Errors.Auth.InvalidCredentials,Invalid credentials,Неверные учётные данные,無効な認証情報,Invalid credentials
+Errors.Auth.SessionExpired,Session expired,Сессия истекла,セッションが期限切れです,Session expired
+Errors.System.OutOfMemory,Out of memory,Недостаточно памяти,メモリ不足,Out of memory
+Errors.System.FileNotFound,File not found: {fileName},Файл не найден: {fileName},ファイルが見つかりません: {fileName},File not found
+Errors.System.PermissionDenied,Permission denied,Доступ запрещён,アクセス拒否,Permission denied
+Errors.Localization.KeyNotFound,Text not found: {key},Текст не найден: {key},テキストが見つかりません: {key},Localization key not found
+Errors.Localization.LoadFailed,Failed to load localization: {locale},Не удалось загрузить локализацию: {locale},ローカライゼーションの読み込みに失敗しました: {locale},Localization load failed

@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Settings",
+  "entries": {
+    "Settings.Audio": "オーディオ",
+    "Settings.Back": "戻る",
+    "Settings.Language": "言語",
+    "Settings.Title": "設定",
+    "Settings.Volume": "音量: {volume}%"
+  }
+}

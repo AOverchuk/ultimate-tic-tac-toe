@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Gameplay",
+  "entries": {
+    "Board.SelectCell": "Выберите клетку",
+    "Board.InvalidMove": "Недопустимый ход",
+    "Board.LocalBoardWon": "Локальное поле выиграно!",
+    "Board.LocalBoardDraw": "Ничья на локальном поле",
+    "Board.MustPlayInBoard": "Вы должны сыграть на поле {boardIndex}",
+    "Board.AnyBoardAvailable": "Играйте на любом доступном поле",
+    "Turn.Timeout": "Время хода истекло!",
+    "Turn.TimeRemaining": "Осталось {seconds}с",
+    "Mode.Classic": "Классический режим",
+    "Mode.Ultimate": "Ультимативный режим",
+    "Mode.Blitz": "Блиц",
+    "Mode.Description.Classic": "Стандартные крестики-нолики",
+    "Mode.Description.Ultimate": "Крестики-нолики внутри крестиков-ноликов",
+    "Mode.Description.Blitz": "Быстрая игра с ограничением времени",
+    "Player.X": "X",
+    "Player.O": "O",
+    "Player.Waiting": "Ожидание противника...",
+    "Player.Disconnected": "Противник отключился",
+    "Player.Reconnecting": "Противник переподключается...",
+    "Hint.FirstMove": "Сделайте первый ход!",
+    "Hint.FollowRules": "Следуйте правилам игры",
+    "Hint.WatchTimer": "Следите за таймером!",
+    "Stats.Wins": "Побед: {wins}",
+    "Stats.Losses": "Поражений: {losses}",
+    "Stats.Draws": "Ничьих: {draws}",
+    "Stats.WinRate": "Процент побед: {rate}%"
+  }
+}

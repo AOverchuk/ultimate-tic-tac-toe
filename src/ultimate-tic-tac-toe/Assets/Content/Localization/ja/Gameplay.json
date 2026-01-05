@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Gameplay",
+  "entries": {
+    "Board.SelectCell": "マスを選択",
+    "Board.InvalidMove": "無効な手",
+    "Board.LocalBoardWon": "ローカルボード勝利！",
+    "Board.LocalBoardDraw": "ローカルボード引き分け",
+    "Board.MustPlayInBoard": "ボード{boardIndex}でプレイする必要があります",
+    "Board.AnyBoardAvailable": "利用可能な任意のボードでプレイ",
+    "Turn.Timeout": "ターンタイムアウト！",
+    "Turn.TimeRemaining": "残り{seconds}秒",
+    "Mode.Classic": "クラシックモード",
+    "Mode.Ultimate": "アルティメットモード",
+    "Mode.Blitz": "ブリッツモード",
+    "Mode.Description.Classic": "標準的な○×ゲーム",
+    "Mode.Description.Ultimate": "○×ゲームの中の○×ゲーム",
+    "Mode.Description.Blitz": "時間制限付きの高速ゲーム",
+    "Player.X": "×",
+    "Player.O": "○",
+    "Player.Waiting": "対戦相手を待っています...",
+    "Player.Disconnected": "対戦相手が切断されました",
+    "Player.Reconnecting": "対戦相手が再接続中...",
+    "Hint.FirstMove": "最初の手を打ちましょう！",
+    "Hint.FollowRules": "ルールに従ってください",
+    "Hint.WatchTimer": "タイマーに注意！",
+    "Stats.Wins": "勝利数: {wins}",
+    "Stats.Losses": "敗北数: {losses}",
+    "Stats.Draws": "引き分け数: {draws}",
+    "Stats.WinRate": "勝率: {rate}%"
+  }
+}

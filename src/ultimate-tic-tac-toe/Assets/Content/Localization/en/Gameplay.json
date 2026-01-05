@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Gameplay",
+  "entries": {
+    "Board.SelectCell": "Select a cell",
+    "Board.InvalidMove": "Invalid move",
+    "Board.LocalBoardWon": "Local board won!",
+    "Board.LocalBoardDraw": "Local board draw",
+    "Board.MustPlayInBoard": "You must play in board {boardIndex}",
+    "Board.AnyBoardAvailable": "Play in any available board",
+    "Turn.Timeout": "Turn timeout!",
+    "Turn.TimeRemaining": "{seconds}s remaining",
+    "Mode.Classic": "Classic Mode",
+    "Mode.Ultimate": "Ultimate Mode",
+    "Mode.Blitz": "Blitz Mode",
+    "Mode.Description.Classic": "Standard Tic-Tac-Toe",
+    "Mode.Description.Ultimate": "Tic-Tac-Toe within Tic-Tac-Toe",
+    "Mode.Description.Blitz": "Fast-paced with time limits",
+    "Player.X": "X",
+    "Player.O": "O",
+    "Player.Waiting": "Waiting for opponent...",
+    "Player.Disconnected": "Opponent disconnected",
+    "Player.Reconnecting": "Opponent reconnecting...",
+    "Hint.FirstMove": "Make your first move!",
+    "Hint.FollowRules": "Follow the board rules",
+    "Hint.WatchTimer": "Watch the timer!",
+    "Stats.Wins": "Wins: {wins}",
+    "Stats.Losses": "Losses: {losses}",
+    "Stats.Draws": "Draws: {draws}",
+    "Stats.WinRate": "Win Rate: {rate}%"
+  }
+}

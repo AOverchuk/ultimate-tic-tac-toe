@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "Settings",
+  "entries": {
+    "Settings.Audio": "Audio",
+    "Settings.Back": "Back",
+    "Settings.Language": "Language",
+    "Settings.Title": "Settings",
+    "Settings.Volume": "Volume: {volume}%"
+  }
+}

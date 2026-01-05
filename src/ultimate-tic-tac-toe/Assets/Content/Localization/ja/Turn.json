@@ -1,0 +1,9 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Turn",
+  "entries": {
+    "Turn.TimeRemaining": "残り{seconds}秒",
+    "Turn.Timeout": "ターンタイムアウト！"
+  }
+}

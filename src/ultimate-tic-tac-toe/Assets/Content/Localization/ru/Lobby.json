@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Lobby",
+  "entries": {
+    "Lobby.Cancel": "Отмена",
+    "Lobby.PlayerJoined": "{playerName} присоединился",
+    "Lobby.PlayerLeft": "{playerName} вышел",
+    "Lobby.Ready": "Готов",
+    "Lobby.WaitingForPlayers": "Ожидание игроков..."
+  }
+}

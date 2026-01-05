@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Board",
+  "entries": {
+    "Board.AnyBoardAvailable": "Играйте на любом доступном поле",
+    "Board.InvalidMove": "Недопустимый ход",
+    "Board.LocalBoardDraw": "Ничья на локальном поле",
+    "Board.LocalBoardWon": "Локальное поле выиграно!",
+    "Board.MustPlayInBoard": "Вы должны сыграть на поле {boardIndex}",
+    "Board.SelectCell": "Выберите клетку"
+  }
+}

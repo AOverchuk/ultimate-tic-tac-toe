@@ -72,8 +72,9 @@ namespace Runtime.UI.Examples
                 } as IReadOnlyDictionary<string, object>
             );
 
+            // Use existing key from content: Game.OpponentTurn
             AddDisposable(_localization
-                .Observe(new TextTableId("UI"), new TextKey("Game.Turn.Player"), playerTurnArgs)
+                .Observe(new TextTableId("UI"), new TextKey("Game.OpponentTurn"), playerTurnArgs)
                 .Subscribe(text => _playerTurnText.Value = text));
         }
 
@@ -83,11 +84,14 @@ namespace Runtime.UI.Examples
 
         /// <summary>
         /// Пример синхронного резолва (использовать только для non-UI логики).
+        /// 
+        /// Note: errorKey is resolved as-is inside the "Errors" table.
+        /// Example: "Network.ConnectionFailed" resolves to key "Network.ConnectionFailed" in table "Errors".
         /// </summary>
-        public string GetLocalizedErrorMessage(string errorCode) =>
+        public string GetLocalizedErrorMessage(string errorKey) =>
             _localization.Resolve(
                 new TextTableId("Errors"),
-                new TextKey($"Error.{errorCode}"));
+                new TextKey(errorKey));
 
         protected override void OnDispose()
         {

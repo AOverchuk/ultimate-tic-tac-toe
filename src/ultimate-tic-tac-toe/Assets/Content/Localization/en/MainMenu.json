@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0",
+  "locale": "en-US",
+  "table": "MainMenu",
+  "entries": {
+    "MainMenu.CreateRoom": "Create Room",
+    "MainMenu.Exit": "Exit",
+    "MainMenu.ExitButton": "Exit",
+    "MainMenu.JoinRoom": "Join Room",
+    "MainMenu.Play": "Play",
+    "MainMenu.QuickMatch": "Quick Match",
+    "MainMenu.Settings": "Settings",
+    "MainMenu.StartButton": "Play",
+    "MainMenu.Title": "Ultimate Tic-Tac-Toe"
+  }
+}

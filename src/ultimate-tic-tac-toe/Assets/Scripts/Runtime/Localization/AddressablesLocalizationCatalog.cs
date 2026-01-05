@@ -24,28 +24,18 @@ namespace Runtime.Localization
         public string GetAssetKey(LocaleId locale, TextTableId table)
         {
             // Convention-based, deterministic mapping.
-            // Uses full locale (including region) to avoid collisions like en-US vs en-GB.
-            // Example: "loc_en_us_ui".
-            var localeToken = NormalizeLocaleToken(locale);
+            // Uses short locale code (language only, without region) for simplicity.
+            // Example: "loc_en_ui" (not "loc_en_us_ui").
+            
+            if (!locale.TryGetLanguageOnly(out var languageOnly))
+                throw new ArgumentException($"Invalid locale: '{locale.Code}'", nameof(locale));
+            
+            var localeToken = languageOnly.Code.ToLowerInvariant();
             var tableName = table.Name.Trim().ToLowerInvariant();
 
-            if (string.IsNullOrEmpty(localeToken))
-                throw new ArgumentException($"Invalid locale: '{locale.Code}'", nameof(locale));
-
-            if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentException("Invalid table.", nameof(table));
-
-            return $"loc_{localeToken}_{tableName}";
-        }
-
-        private static string NormalizeLocaleToken(LocaleId locale)
-        {
-            var code = locale.Code;
-            
-            if (string.IsNullOrWhiteSpace(code))
-                return string.Empty;
-
-            return code.Trim().ToLowerInvariant().Replace('-', '_');
+            return string.IsNullOrEmpty(tableName) 
+                ? throw new ArgumentException("Invalid table.", nameof(table)) 
+                : $"loc_{localeToken}_{tableName}";
         }
     }
 }

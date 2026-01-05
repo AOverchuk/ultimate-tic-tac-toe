@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0",
+  "locale": "ru-RU",
+  "table": "Mode",
+  "entries": {
+    "Mode.Blitz": "Блиц",
+    "Mode.Classic": "Классический режим",
+    "Mode.Description.Blitz": "Быстрая игра с ограничением времени",
+    "Mode.Description.Classic": "Стандартные крестики-нолики",
+    "Mode.Description.Ultimate": "Крестики-нолики внутри крестиков-ноликов",
+    "Mode.Ultimate": "Ультимативный режим"
+  }
+}

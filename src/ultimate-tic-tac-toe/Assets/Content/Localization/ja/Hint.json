@@ -1,0 +1,10 @@
+﻿{
+  "version": "1.0",
+  "locale": "ja-JP",
+  "table": "Hint",
+  "entries": {
+    "Hint.FirstMove": "最初の手を打ちましょう！",
+    "Hint.FollowRules": "ルールに従ってください",
+    "Hint.WatchTimer": "タイマーに注意！"
+  }
+}
