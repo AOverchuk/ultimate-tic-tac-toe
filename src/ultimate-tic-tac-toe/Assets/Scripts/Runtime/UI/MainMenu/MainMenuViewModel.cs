@@ -1,11 +1,14 @@
 using R3;
 using Runtime.Localization;
 using Runtime.UI.Core;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 
 namespace Runtime.UI.MainMenu
 {
     public sealed class MainMenuViewModel : BaseViewModel
     {
+        private readonly ILocalizationService _localization;
         private readonly ReactiveProperty<bool> _isInteractable = new(true);
         private readonly Subject<Unit> _startGameRequested = new();
         private readonly Subject<Unit> _exitRequested = new();
@@ -25,12 +28,17 @@ namespace Runtime.UI.MainMenu
             if (localization == null)
                 throw new System.ArgumentNullException(nameof(localization));
 
+            _localization = localization;
+
             var table = new TextTableId("MainMenu");
             Title = localization.Observe(table, new TextKey("MainMenu.Title"));
             StartButtonText = localization.Observe(table, new TextKey("MainMenu.StartButton"));
             SettingsButtonText = localization.Observe(table, new TextKey("MainMenu.Settings"));
             ExitButtonText = localization.Observe(table, new TextKey("MainMenu.ExitButton"));
         }
+
+        public UniTask PreloadOnOpenAsync(CancellationToken cancellationToken) =>
+            _localization.PreloadCurrentLocaleAsync(new TextTableId("MainMenu"), cancellationToken);
 
         public void SetInteractable(bool isInteractable) => _isInteractable.Value = isInteractable;
 

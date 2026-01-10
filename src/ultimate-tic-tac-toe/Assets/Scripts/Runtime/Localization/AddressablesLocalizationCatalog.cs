@@ -15,13 +15,18 @@ namespace Runtime.Localization
         private static readonly TextTableId[] _startupTables =
         {
             new TextTableId("Common"),
-            new TextTableId("MainMenu"),
-            new TextTableId("Settings"),
+            TextTableId.Errors,
+        };
+
+        private static readonly TextTableId[] _requiredTables =
+        {
+            new TextTableId("Common"),
             TextTableId.Errors,
         };
 
         public IReadOnlyList<LocaleId> GetSupportedLocales() => _supportedLocales;
         public IReadOnlyList<TextTableId> GetStartupTables() => _startupTables;
+        public IReadOnlyList<TextTableId> GetRequiredTables() => _requiredTables;
 
         public string GetAssetKey(LocaleId locale, TextTableId table)
         {

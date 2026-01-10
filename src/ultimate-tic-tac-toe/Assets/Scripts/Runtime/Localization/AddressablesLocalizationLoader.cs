@@ -37,6 +37,24 @@ namespace Runtime.Localization
                 }
             }
 
+            var locationsHandle = Addressables.LoadResourceLocationsAsync(key, typeof(TextAsset));
+
+            try
+            {
+                await locationsHandle.ToUniTask(cancellationToken: cancellationToken);
+
+                if (locationsHandle.Status != AsyncOperationStatus.Succeeded ||
+                    locationsHandle.Result == null ||
+                    locationsHandle.Result.Count == 0)
+                {
+                    throw new KeyNotFoundException($"No Addressables location found for key '{key}'.");
+                }
+            }
+            finally
+            {
+                Addressables.Release(locationsHandle);
+            }
+
             var handle = Addressables.LoadAssetAsync<TextAsset>(key);
             _handles[key] = handle;
 

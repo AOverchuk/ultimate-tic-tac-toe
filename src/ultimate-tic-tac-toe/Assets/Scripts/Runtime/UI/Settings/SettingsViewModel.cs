@@ -1,6 +1,8 @@
 using R3;
 using Runtime.Localization;
 using Runtime.UI.Core;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 
 namespace Runtime.UI.Settings
 {
@@ -24,6 +26,9 @@ namespace Runtime.UI.Settings
             BackButtonText = _localizationService.Observe("Settings", "Settings.Back");
             TitleText = _localizationService.Observe("Settings", "Settings.Title");
         }
+
+        public UniTask PreloadOnOpenAsync(CancellationToken cancellationToken) =>
+            _localizationService.PreloadCurrentLocaleAsync(new TextTableId("Settings"), cancellationToken);
 
         public override void Initialize()
         {

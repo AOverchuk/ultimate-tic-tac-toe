@@ -1,6 +1,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Runtime.Infrastructure.Logging;
+using Runtime.Localization;
 using Runtime.Services.Assets;
 using Runtime.Services.UI;
 using Runtime.UI.MainMenu;
@@ -14,18 +15,21 @@ namespace Runtime.Infrastructure.GameStateMachine.States
         private readonly IMainMenuCoordinator _coordinator;
         private readonly IAssetProvider _assets;
         private readonly AssetLibrary _assetLibrary;
+        private readonly ILocalizationService _localization;
         private bool _isExited;
 
         public MainMenuState(
             IUIService uiService, 
             IMainMenuCoordinator coordinator,
             IAssetProvider assets,
-            AssetLibrary assetLibrary)
+            AssetLibrary assetLibrary,
+            ILocalizationService localization)
         {
             _uiService = uiService;
             _coordinator = coordinator;
             _assets = assets;
             _assetLibrary = assetLibrary;
+            _localization = localization;
         }
 
         public async UniTask EnterAsync(CancellationToken cancellationToken = default)
@@ -57,6 +61,12 @@ namespace Runtime.Infrastructure.GameStateMachine.States
             {
                  Log.Error(LogTags.Scenes, "[MainMenuState] LanguageSelectionPrefab is missing or invalid. Language selection will be disabled.");
             }
+
+            // No-flicker: preload required table BEFORE showing the window.
+            await _localization.PreloadAsync(
+                _localization.CurrentLocale.CurrentValue,
+                new[] { new TextTableId("MainMenu") },
+                cancellationToken);
 
             var view = _uiService.Open<MainMenuView, MainMenuViewModel>();
             

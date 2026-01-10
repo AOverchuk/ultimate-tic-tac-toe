@@ -50,6 +50,7 @@ namespace Tests.PlayMode.Localization
 
             _mockCatalog.GetSupportedLocales().Returns(new[] { _enUs, _ruRu });
             _mockCatalog.GetStartupTables().Returns(new[] { _uiTable });
+            _mockCatalog.GetRequiredTables().Returns(Array.Empty<TextTableId>());
             _mockCatalog.GetAssetKey(Arg.Any<LocaleId>(), Arg.Any<TextTableId>()).Returns("mock-asset-key");
             _mockStorage.LoadAsync().Returns(UniTask.FromResult<LocaleId?>(null));
 

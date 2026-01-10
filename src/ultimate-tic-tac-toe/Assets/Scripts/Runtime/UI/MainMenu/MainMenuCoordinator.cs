@@ -5,6 +5,7 @@ using R3;
 using Runtime.Infrastructure.Logging;
 using Runtime.Infrastructure.GameStateMachine;
 using Runtime.Infrastructure.GameStateMachine.States;
+using Runtime.Localization;
 using Runtime.Services.UI;
 using Runtime.UI.Settings;
 using StripLog;
@@ -17,14 +18,16 @@ namespace Runtime.UI.MainMenu
         private MainMenuViewModel _viewModel;
         private readonly IGameStateMachine _stateMachine;
         private readonly IUIService _uiService;
+        private readonly ILocalizationService _localization;
         private CompositeDisposable _disposables = new();
         private CancellationTokenSource _lifecycleCts = new();
         private bool _isDisposed;
 
-        public MainMenuCoordinator(IGameStateMachine stateMachine, IUIService uiService)
+        public MainMenuCoordinator(IGameStateMachine stateMachine, IUIService uiService, ILocalizationService localization)
         {
             _stateMachine = stateMachine ?? throw new ArgumentNullException(nameof(stateMachine));
             _uiService = uiService ?? throw new ArgumentNullException(nameof(uiService));
+            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
 
         public void Initialize(MainMenuViewModel viewModel)
@@ -53,7 +56,13 @@ namespace Runtime.UI.MainMenu
                 .AddTo(_disposables);
 
             _viewModel.SettingsRequested
-                .Subscribe(_ => OpenSettings())
+                .Subscribe(_ => OpenSettingsAsync(_lifecycleCts.Token).Forget(ex =>
+                {
+                    if (ex is OperationCanceledException)
+                        return;
+
+                    Log.Exception(ex, LogTags.UI);
+                }))
                 .AddTo(_disposables);
         }
 
@@ -90,8 +99,16 @@ namespace Runtime.UI.MainMenu
 #endif
         }
 
-        private void OpenSettings()
+        private async UniTask OpenSettingsAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // No-flicker: preload required table BEFORE showing the window.
+            await _localization.PreloadAsync(
+                _localization.CurrentLocale.CurrentValue,
+                new[] { new TextTableId("Settings") },
+                cancellationToken);
+
             // SettingsView and LanguageSelectionView are transient, opened on top of MainMenu
             var settingsView = _uiService.Open<SettingsView, SettingsViewModel>();
             

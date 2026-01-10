@@ -24,6 +24,7 @@ namespace Runtime.Localization
     {
         IReadOnlyList<LocaleId> GetSupportedLocales();
         IReadOnlyList<TextTableId> GetStartupTables();
+        IReadOnlyList<TextTableId> GetRequiredTables();
         string GetAssetKey(LocaleId locale, TextTableId table);
     }
 

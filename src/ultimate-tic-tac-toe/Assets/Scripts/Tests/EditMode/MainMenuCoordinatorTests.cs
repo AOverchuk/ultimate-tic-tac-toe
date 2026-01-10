@@ -40,8 +40,14 @@ namespace Tests.EditMode
             _localizationMock = Substitute.For<ILocalizationService>();
             _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Any<TextKey>(), Arg.Any<IReadOnlyDictionary<string, object>>())
                 .Returns(Observable.Return("Test"));
+            _localizationMock.CurrentLocale.Returns(new ReactiveProperty<LocaleId>(LocaleId.EnglishUs));
+            _localizationMock.PreloadAsync(
+                    Arg.Any<LocaleId>(),
+                    Arg.Any<IReadOnlyList<TextTableId>>(),
+                    Arg.Any<CancellationToken>())
+                .Returns(UniTask.CompletedTask);
             
-            _coordinator = new MainMenuCoordinator(_stateMachineMock, _uiServiceMock);
+            _coordinator = new MainMenuCoordinator(_stateMachineMock, _uiServiceMock, _localizationMock);
             _viewModel = new MainMenuViewModel(_localizationMock);
             _viewModel.Initialize();
             _cancellationToken = CancellationToken.None;
@@ -247,7 +253,7 @@ namespace Tests.EditMode
         public void WhenConstructorWithNullStateMachine_ThenThrowsArgumentNullException()
         {
             // Act & Assert
-            Action act = () => new MainMenuCoordinator(null, _uiServiceMock);
+            Action act = () => new MainMenuCoordinator(null, _uiServiceMock, _localizationMock);
             
             act.Should().Throw<ArgumentNullException>()
                 .WithParameterName("stateMachine");
@@ -257,10 +263,20 @@ namespace Tests.EditMode
         public void WhenConstructorWithNullUIService_ThenThrowsArgumentNullException()
         {
             // Act & Assert
-            Action act = () => new MainMenuCoordinator(_stateMachineMock, null);
+            Action act = () => new MainMenuCoordinator(_stateMachineMock, null, _localizationMock);
             
             act.Should().Throw<ArgumentNullException>()
                 .WithParameterName("uiService");
+        }
+
+        [Test]
+        public void WhenConstructorWithNullLocalization_ThenThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Action act = () => new MainMenuCoordinator(_stateMachineMock, _uiServiceMock, null);
+
+            act.Should().Throw<ArgumentNullException>()
+                .WithParameterName("localization");
         }
 
         #endregion
@@ -268,7 +284,7 @@ namespace Tests.EditMode
         #region Phase 5 UI Integration
 
         [Test]
-        public void WhenSettingsRequestedFromMenu_ThenOpensSettingsWindow()
+        public async Task WhenSettingsRequestedFromMenu_ThenOpensSettingsWindow()
         {
             var settingsVm = new SettingsViewModel(_localizationMock);
             var settingsView = CreateInactiveSettingsView(settingsVm);
@@ -277,6 +293,9 @@ namespace Tests.EditMode
             _coordinator.Initialize(_viewModel);
 
             _viewModel.RequestSettings();
+
+            // OpenSettingsAsync runs via Forget; yield to let it execute.
+            await UniTask.Yield();
 
             _uiServiceMock.Received(1).Open<SettingsView, SettingsViewModel>();
         }
@@ -295,7 +314,7 @@ namespace Tests.EditMode
         }
 
         [Test]
-        public void WhenLanguageRequestedFromSettings_ThenOpensLanguageSelectionWindow()
+        public async Task WhenLanguageRequestedFromSettings_ThenOpensLanguageSelectionWindow()
         {
             var settingsVm = new SettingsViewModel(_localizationMock);
             var settingsView = CreateInactiveSettingsView(settingsVm);
@@ -308,13 +327,14 @@ namespace Tests.EditMode
             _coordinator.Initialize(_viewModel);
 
             _viewModel.RequestSettings();
+            await UniTask.Yield();
             settingsVm.OpenLanguageSelection();
 
             _uiServiceMock.Received(1).Open<LanguageSelectionView, LanguageSelectionViewModel>();
         }
 
         [Test]
-        public void WhenSettingsClosed_ThenLanguageRequestDoesNotOpenLanguageSelectionWindow()
+        public async Task WhenSettingsClosed_ThenLanguageRequestDoesNotOpenLanguageSelectionWindow()
         {
             var settingsVm = new SettingsViewModel(_localizationMock);
             var settingsView = CreateInactiveSettingsView(settingsVm);
@@ -323,6 +343,7 @@ namespace Tests.EditMode
             _coordinator.Initialize(_viewModel);
 
             _viewModel.RequestSettings();
+            await UniTask.Yield();
             settingsVm.Close();
             settingsVm.OpenLanguageSelection();
 
@@ -330,7 +351,7 @@ namespace Tests.EditMode
         }
 
         [Test]
-        public void WhenSettingsOpenFails_ThenLogsErrorAndDoesNotThrow()
+        public async Task WhenSettingsOpenFails_ThenLogsErrorAndDoesNotThrow()
         {
             try
             {
@@ -340,6 +361,8 @@ namespace Tests.EditMode
 
                 _viewModel.Invoking(vm => vm.RequestSettings())
                     .Should().NotThrow();
+
+                await UniTask.Yield();
             }
             finally
             {
@@ -348,7 +371,7 @@ namespace Tests.EditMode
         }
 
         [Test]
-        public void WhenLanguageSelectionOpenFails_ThenLogsErrorAndDoesNotThrow()
+        public async Task WhenLanguageSelectionOpenFails_ThenLogsErrorAndDoesNotThrow()
         {
             try
             {
@@ -362,6 +385,7 @@ namespace Tests.EditMode
                 _coordinator.Initialize(_viewModel);
 
                 _viewModel.RequestSettings();
+                await UniTask.Yield();
                 _viewModel.Invoking(_ => settingsVm.OpenLanguageSelection()).Should().NotThrow();
             }
             finally

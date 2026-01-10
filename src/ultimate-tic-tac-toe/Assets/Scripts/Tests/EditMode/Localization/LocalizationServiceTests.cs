@@ -24,6 +24,8 @@ namespace Tests.EditMode.Localization
         private ITextFormatter _mockFormatter;
         private ILocaleStorage _mockStorage;
 
+        private Subject<LocalizationStoreEvent> _storeEvents;
+
         private LocaleId _enUs;
         private LocaleId _ruRu;
         private TextTableId _uiTable;
@@ -42,6 +44,8 @@ namespace Tests.EditMode.Localization
             _testKey = new TextKey("Test.Key");
 
             _mockStore = Substitute.For<ILocalizationStore>();
+            _storeEvents = new Subject<LocalizationStoreEvent>();
+            _mockStore.Events.Returns(_storeEvents);
             _mockLoader = Substitute.For<ILocalizationLoader>();
             _parser = new JsonLocalizationParser(); // Real parser
             _mockCatalog = Substitute.For<ILocalizationCatalog>();
@@ -51,10 +55,17 @@ namespace Tests.EditMode.Localization
 
             _mockPolicy.DefaultLocale.Returns(_enUs);
             _mockPolicy.UseMissingKeyPlaceholders.Returns(true);
+            _mockPolicy.GetFallbackChain(Arg.Any<LocaleId>()).Returns(ci =>
+            {
+                var requested = (LocaleId)ci[0];
+                return new[] { requested };
+            });
             _mockCatalog.GetSupportedLocales().Returns(new[] { _enUs, _ruRu });
             _mockCatalog.GetStartupTables().Returns(new[] { _uiTable });
+            _mockCatalog.GetRequiredTables().Returns(Array.Empty<TextTableId>());
             _mockCatalog.GetAssetKey(Arg.Any<LocaleId>(), Arg.Any<TextTableId>()).Returns("mock-asset-key");
             _mockStorage.LoadAsync().Returns(UniTask.FromResult<LocaleId?>(null));
+            _mockStorage.SaveAsync(Arg.Any<LocaleId>()).Returns(UniTask.CompletedTask);
 
             _service = new LocalizationService(
                 _mockStore,
@@ -67,7 +78,11 @@ namespace Tests.EditMode.Localization
         }
 
         [TearDown]
-        public void TearDown() => _service?.Dispose();
+        public void TearDown()
+        {
+            _service?.Dispose();
+            _storeEvents?.Dispose();
+        }
 
         #endregion
 
@@ -374,6 +389,133 @@ namespace Tests.EditMode.Localization
             _service.CurrentLocale.CurrentValue.Should().Be(_enUs); // Should remain unchanged
         }
 
+        [Test]
+        public async Task WhenSetLocaleAsyncIsPreloading_ThenDoesNotChangeCurrentLocaleUntilPreloadCompletes()
+        {
+            // Arrange
+            var startupTable = new TextTableId("Common");
+            var usedTable = _gameplayTable;
+            _mockCatalog.GetStartupTables().Returns(new[] { startupTable });
+
+            // Init path: return minimal valid JSON for the startup table.
+            _mockCatalog.GetAssetKey(_enUs, startupTable).Returns($"{_enUs.Code}_{startupTable.Name}");
+            var initJson = $"{{\"locale\":\"{_enUs.Code}\",\"table\":\"{startupTable.Name}\",\"entries\":{{}}}}";
+            _mockLoader.LoadBytesAsync($"{_enUs.Code}_{startupTable.Name}", Arg.Any<CancellationToken>())
+                .Returns(UniTask.FromResult(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(initJson))));
+
+            _mockStore.GetActiveLocale().Returns(_enUs);
+            _mockStore.TryResolveTemplate(usedTable, _testKey, out Arg.Any<string>()).Returns(false);
+
+            // Initialize service
+            await _service.InitializeAsync(CancellationToken.None);
+
+            // Mark a non-startup table as used (tracked)
+            _service.Resolve(usedTable, _testKey);
+
+            // Switch path: delay the first preload (startup table) to simulate async loading.
+            var keyMap = new Dictionary<string, (LocaleId Locale, TextTableId Table)>(StringComparer.Ordinal);
+            _mockCatalog
+                .GetAssetKey(Arg.Any<LocaleId>(), Arg.Any<TextTableId>())
+                .Returns(ci =>
+                {
+                    var loc = (LocaleId)ci[0];
+                    var table = (TextTableId)ci[1];
+                    var assetKey = $"{loc.Code}_{table.Name}";
+                    keyMap[assetKey] = (loc, table);
+                    return assetKey;
+                });
+
+            var delayed = new UniTaskCompletionSource<ReadOnlyMemory<byte>>();
+            var switchCall = 0;
+
+            _mockLoader
+                .LoadBytesAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(ci =>
+                {
+                    var assetKey = (string)ci[0];
+
+                    // First preload call during switch is delayed.
+                    if (switchCall++ == 0)
+                        return delayed.Task;
+
+                    var (loc, table) = keyMap[assetKey];
+                    var json = $"{{\"locale\":\"{loc.Code}\",\"table\":\"{table.Name}\",\"entries\":{{}}}}";
+                    return UniTask.FromResult(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(json)));
+                });
+
+            // Act
+            var switchTask = _service.SetLocaleAsync(_ruRu, CancellationToken.None);
+            await UniTask.Yield();
+
+            // Assert - while preload is pending, locale must not change and store should not be switched.
+            _service.CurrentLocale.CurrentValue.Should().Be(_enUs);
+            _mockStore.DidNotReceive().SetActiveLocale(_ruRu);
+
+            // Complete delayed preload
+            var delayedJson = $"{{\"locale\":\"{_ruRu.Code}\",\"table\":\"{startupTable.Name}\",\"entries\":{{}}}}";
+            delayed.TrySetResult(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(delayedJson)));
+
+            await switchTask;
+
+            // Assert - after preload completes, locale switches.
+            _service.CurrentLocale.CurrentValue.Should().Be(_ruRu);
+            _mockStore.Received(1).SetActiveLocale(_ruRu);
+        }
+
+        [Test]
+        public void WhenSetLocaleAsyncAndTableWasUsed_ThenPreloadsStartupAndUsedTablesForNewLocale()
+        {
+            // Arrange
+            // Startup table is minimal, used table is outside startup.
+            var startupTable = new TextTableId("Common");
+            var usedTable = _gameplayTable;
+            _mockCatalog.GetStartupTables().Returns(new[] { startupTable });
+
+            // Map assetKey -> (locale, table) so loader can return valid JSON matching ParseTable checks.
+            var keyMap = new Dictionary<string, (LocaleId Locale, TextTableId Table)>(StringComparer.Ordinal);
+
+            _mockCatalog
+                .GetAssetKey(Arg.Any<LocaleId>(), Arg.Any<TextTableId>())
+                .Returns(ci =>
+                {
+                    var loc = (LocaleId)ci[0];
+                    var table = (TextTableId)ci[1];
+                    var assetKey = $"{loc.Code}_{table.Name}";
+                    keyMap[assetKey] = (loc, table);
+                    return assetKey;
+                });
+
+            _mockLoader
+                .LoadBytesAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(ci =>
+                {
+                    var assetKey = (string)ci[0];
+                    var (loc, table) = keyMap[assetKey];
+                    var json = $"{{\"locale\":\"{loc.Code}\",\"table\":\"{table.Name}\",\"entries\":{{\"{_testKey.Value}\":\"Value\"}}}}";
+                    return UniTask.FromResult(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(json)));
+                });
+
+            // Ensure Resolve() can run and will track the table even if missing.
+            _mockStore.GetActiveLocale().Returns(_enUs);
+            _mockStore.TryResolveTemplate(usedTable, _testKey, out Arg.Any<string>()).Returns(false);
+
+            // Act
+            _service.InitializeAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+            // Mark used table as "in use" (tracked)
+            _service.Resolve(usedTable, _testKey);
+
+            // Clear init calls so we only assert switch behavior
+            _mockCatalog.ClearReceivedCalls();
+            _mockLoader.ClearReceivedCalls();
+
+            _service.SetLocaleAsync(_ruRu, CancellationToken.None).GetAwaiter().GetResult();
+
+            // Assert - locale switch preloads both startup and previously used tables
+            _mockCatalog.Received(1).GetAssetKey(_ruRu, startupTable);
+            _mockCatalog.Received(1).GetAssetKey(_ruRu, usedTable);
+        }
+
         #endregion
 
         #region Preload/Resource Management Tests
@@ -425,6 +567,72 @@ namespace Tests.EditMode.Localization
             capturedError.Should().NotBeNull();
             capturedError.Value.Code.Should().Be(LocalizationErrorCode.AddressablesLoadFailed);
             _mockLoader.Received(1).Release(assetKey);
+        }
+
+        [Test]
+        public void WhenPreloadAsyncAndRequestedLocaleHasFallback_ThenLoadsFirstAvailableLocale()
+        {
+            // Arrange
+            InitializeService();
+
+            var fallbackLocale = _enUs;
+            var chain = new[] { _ruRu, fallbackLocale };
+            _mockPolicy.GetFallbackChain(_ruRu).Returns(chain);
+
+            const string requestedKey = "ru-RU_Gameplay";
+            const string fallbackKey = "en-US_Gameplay";
+            _mockCatalog.GetAssetKey(_ruRu, _gameplayTable).Returns(requestedKey);
+            _mockCatalog.GetAssetKey(fallbackLocale, _gameplayTable).Returns(fallbackKey);
+
+            _mockLoader.LoadBytesAsync(requestedKey, Arg.Any<CancellationToken>())
+                .Returns<UniTask<ReadOnlyMemory<byte>>>(_ => throw new KeyNotFoundException("Missing"));
+
+            const string json = @"{""locale"":""en-US"",""table"":""Gameplay"",""entries"":{}}";
+            var bytes = new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(json));
+            _mockLoader.LoadBytesAsync(fallbackKey, Arg.Any<CancellationToken>()).Returns(UniTask.FromResult(bytes));
+
+            // Act
+            var task = _service.PreloadAsync(_ruRu, new[] { _gameplayTable }, CancellationToken.None);
+            task.GetAwaiter().GetResult();
+
+            // Assert
+            _mockLoader.Received(1).LoadBytesAsync(requestedKey, Arg.Any<CancellationToken>());
+            _mockLoader.Received(1).LoadBytesAsync(fallbackKey, Arg.Any<CancellationToken>());
+            _mockLoader.Received(1).Release(requestedKey);
+            _mockLoader.Received(1).Release(fallbackKey);
+
+            _mockStore.Received(1).Put(Arg.Is<LocalizationTable>(t => t.Locale == fallbackLocale && t.TableId == _gameplayTable));
+        }
+
+        [Test]
+        public void WhenPreloadAsyncAndTableIsRequiredAndAllFallbacksMissing_ThenThrows()
+        {
+            // Arrange
+            InitializeService();
+
+            _mockCatalog.GetRequiredTables().Returns(new[] { _gameplayTable });
+
+            var chain = new[] { _ruRu, _enUs };
+            _mockPolicy.GetFallbackChain(_ruRu).Returns(chain);
+
+            const string requestedKey = "ru-RU_Gameplay";
+            const string fallbackKey = "en-US_Gameplay";
+            _mockCatalog.GetAssetKey(_ruRu, _gameplayTable).Returns(requestedKey);
+            _mockCatalog.GetAssetKey(_enUs, _gameplayTable).Returns(fallbackKey);
+
+            _mockLoader.LoadBytesAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns<UniTask<ReadOnlyMemory<byte>>>(_ => throw new KeyNotFoundException("Missing"));
+
+            // Act
+            Action act = () => _service.PreloadAsync(_ruRu, new[] { _gameplayTable }, CancellationToken.None)
+                .GetAwaiter().GetResult();
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage("*Required localization table*Gameplay*");
+
+            _mockLoader.Received(1).Release(requestedKey);
+            _mockLoader.Received(1).Release(fallbackKey);
         }
 
         #endregion
@@ -506,6 +714,44 @@ namespace Tests.EditMode.Localization
             results.Should().HaveCount(2);
             results[0].Should().Be("English");
             results[1].Should().Be("Russian");
+        }
+
+        [Test]
+        public void WhenObserveAndTableIsLoadedLater_ThenObserveReEmitsResolvedText()
+        {
+            // Arrange
+            InitializeService();
+
+            _mockStore.GetActiveLocale().Returns(_enUs);
+
+            // First resolve: missing. After table load event: resolved.
+            var call = 0;
+            _mockStore.TryResolveTemplate(_uiTable, _testKey, out Arg.Any<string>())
+                .Returns(ci =>
+                {
+                    call++;
+
+                    if (call == 1)
+                        return false;
+
+                    ci[2] = "Template";
+                    return true;
+                });
+
+            _mockFormatter.Format("Template", _enUs, null).Returns("Resolved");
+
+            var results = new List<string>();
+
+            // Act
+            using var subscription = _service.Observe(_uiTable, _testKey, (IReadOnlyDictionary<string, object>)null)
+                .Subscribe(results.Add);
+
+            _storeEvents.OnNext(new LocalizationStoreEvent(LocalizationStoreEventType.TableLoaded, _enUs, _uiTable, string.Empty));
+
+            // Assert
+            results.Should().HaveCount(2);
+            results[0].Should().Be($"⟦Missing: {_uiTable.Name}.{_testKey.Value}⟧");
+            results[1].Should().Be("Resolved");
         }
 
         #endregion

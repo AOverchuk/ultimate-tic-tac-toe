@@ -120,16 +120,26 @@ namespace Tests.EditMode.Localization
         }
 
         [Test]
-        public void WhenGetStartupTables_ThenReturnsCommonMainMenuSettingsAndErrors()
+        public void WhenGetStartupTables_ThenReturnsCommonAndErrors()
         {
             // Act
             var tables = _catalog.GetStartupTables();
 
             // Assert
-            tables.Should().HaveCount(4, "catalog has exactly 4 startup tables");
+            tables.Should().HaveCount(2, "catalog has exactly 2 startup tables");
             tables.Should().Contain(new TextTableId("Common"));
-            tables.Should().Contain(new TextTableId("MainMenu"));
-            tables.Should().Contain(new TextTableId("Settings"));
+            tables.Should().Contain(TextTableId.Errors);
+        }
+
+        [Test]
+        public void WhenGetRequiredTables_ThenReturnsCommonAndErrors()
+        {
+            // Act
+            var tables = _catalog.GetRequiredTables();
+
+            // Assert
+            tables.Should().HaveCount(2, "catalog has exactly 2 required tables");
+            tables.Should().Contain(new TextTableId("Common"));
             tables.Should().Contain(TextTableId.Errors);
         }
     }

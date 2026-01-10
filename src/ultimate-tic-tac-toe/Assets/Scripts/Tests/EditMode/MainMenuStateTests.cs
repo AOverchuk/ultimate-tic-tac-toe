@@ -40,6 +40,12 @@ namespace Tests.EditMode
             _localizationMock = Substitute.For<ILocalizationService>();
             _localizationMock.Observe(Arg.Any<TextTableId>(), Arg.Any<TextKey>(), Arg.Any<IReadOnlyDictionary<string, object>>())
                 .Returns(Observable.Return("Test"));
+            _localizationMock.CurrentLocale.Returns(new ReactiveProperty<LocaleId>(LocaleId.EnglishUs));
+            _localizationMock.PreloadAsync(
+                    Arg.Any<LocaleId>(),
+                    Arg.Any<IReadOnlyList<TextTableId>>(),
+                    Arg.Any<System.Threading.CancellationToken>())
+                .Returns(UniTask.CompletedTask);
             
             _viewModel = new MainMenuViewModel(_localizationMock);
             _viewModel.Initialize();
@@ -71,7 +77,7 @@ namespace Tests.EditMode
 
             _uiService.Open<MainMenuView, MainMenuViewModel>().Returns(_testView);
 
-            _state = new MainMenuState(_uiService, _coordinator, _assets, _assetLibrary);
+            _state = new MainMenuState(_uiService, _coordinator, _assets, _assetLibrary, _localizationMock);
         }
 
         [TearDown]

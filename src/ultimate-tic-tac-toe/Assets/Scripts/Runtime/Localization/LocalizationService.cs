@@ -24,6 +24,9 @@ namespace Runtime.Localization
 
         private readonly HashSet<MissingKeyReportKey> _reportedMissingKeys = new();
 
+        private readonly object _trackedTablesLock = new();
+        private readonly HashSet<TextTableId> _trackedTables = new();
+
         private bool _isInitialized;
 
         private readonly SemaphoreSlim _initializeGate = new(1, 1);
@@ -100,7 +103,9 @@ namespace Runtime.Localization
                     _errors.OnNext(new LocalizationError(LocalizationErrorCode.Unknown, "Failed to load saved locale.", ex));
                 }
 
-                await PreloadAsync(locale, _catalog.GetStartupTables(), cancellationToken);
+                var startupTables = _catalog.GetStartupTables();
+                var requiredTables = _catalog.GetRequiredTables();
+                await PreloadAsync(locale, MergeTables(requiredTables, startupTables), cancellationToken);
 
                 _store.SetActiveLocale(locale);
                 _currentLocale.Value = locale;
@@ -152,7 +157,8 @@ namespace Runtime.Localization
             
             try
             {
-                await PreloadAsync(locale, _catalog.GetStartupTables(), linkedCts.Token);
+                var tablesToPreload = BuildLocaleSwitchPreloadList();
+                await PreloadAsync(locale, tablesToPreload, linkedCts.Token);
 
                 lock (_switchLock)
                 {
@@ -210,37 +216,108 @@ namespace Runtime.Localization
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var table = tables[i];
-                var assetKey = _catalog.GetAssetKey(locale, table);
 
-                try
+                var chain = _policy.GetFallbackChain(locale);
+                var triedKeys = new HashSet<string>(StringComparer.Ordinal);
+                Exception lastException = null;
+
+                for (var j = 0; j < chain.Count; j++)
                 {
-                    var bytes = await _loader.LoadBytesAsync(assetKey, cancellationToken);
-                    var parsedTable = _parser.ParseTable(bytes.Span, locale, table);
-                    _store.Put(parsedTable);
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var candidateLocale = chain[j];
+                    var assetKey = _catalog.GetAssetKey(candidateLocale, table);
+
+                    if (!triedKeys.Add(assetKey))
+                        continue;
+
+                    try
+                    {
+                        var bytes = await _loader.LoadBytesAsync(assetKey, cancellationToken);
+                        var parsedTable = _parser.ParseTable(bytes.Span, candidateLocale, table);
+                        _store.Put(parsedTable);
+                        lastException = null;
+                        break;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        lastException = ex;
+                    }
+                    finally
+                    {
+                        _loader.Release(assetKey);
+                    }
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
+
+                if (lastException != null)
                 {
                     _errors.OnNext(new LocalizationError(
-                        ex is FormatException ? LocalizationErrorCode.ParseFailed : LocalizationErrorCode.AddressablesLoadFailed,
-                        $"Failed to preload table '{table.Name}' for locale '{locale.Code}' (assetKey='{assetKey}').",
-                        ex,
+                        lastException is FormatException ? LocalizationErrorCode.ParseFailed : LocalizationErrorCode.AddressablesLoadFailed,
+                        $"Failed to preload table '{table.Name}' for locale '{locale.Code}'. Tried: {string.Join(", ", triedKeys)}",
+                        lastException,
                         locale,
                         table));
-                }
-                finally
-                {
-                    _loader.Release(assetKey);
+
+                    var requiredTables = _catalog.GetRequiredTables() ?? Array.Empty<TextTableId>();
+                    var isRequired = false;
+
+                    for (var k = 0; k < requiredTables.Count; k++)
+                    {
+                        if (requiredTables[k] == table)
+                        {
+                            isRequired = true;
+                            break;
+                        }
+                    }
+
+                    if (isRequired)
+                        throw new InvalidOperationException(
+                            $"Required localization table '{table.Name}' could not be loaded for locale '{locale.Code}'.");
                 }
             }
+        }
+
+        private static IReadOnlyList<TextTableId> MergeTables(IReadOnlyList<TextTableId> a, IReadOnlyList<TextTableId> b)
+        {
+            if (a == null || a.Count == 0)
+                return b ?? Array.Empty<TextTableId>();
+
+            if (b == null || b.Count == 0)
+                return a;
+
+            var merged = new List<TextTableId>(a.Count + b.Count);
+            for (var i = 0; i < a.Count; i++)
+                merged.Add(a[i]);
+
+            for (var i = 0; i < b.Count; i++)
+            {
+                var table = b[i];
+                var alreadyAdded = false;
+                for (var j = 0; j < merged.Count; j++)
+                {
+                    if (merged[j] == table)
+                    {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyAdded)
+                    merged.Add(table);
+            }
+
+            return merged;
         }
 
         public string Resolve(TextTableId table, TextKey key, IReadOnlyDictionary<string, object> args = null)
         {
             EnsureInitialized();
+
+            TrackTable(table);
 
             if (_store.TryResolveTemplate(table, key, out var template))
             {
@@ -273,6 +350,8 @@ namespace Runtime.Localization
 
             EnsureInitialized();
 
+            TrackTable(table);
+
             return Observable.Create<string>(observer =>
             {
                 IReadOnlyDictionary<string, object> latestArgs = null;
@@ -294,6 +373,23 @@ namespace Runtime.Localization
                     observer.OnNext(text);
                 }
 
+                bool ShouldRefreshOnStoreEvent(LocalizationStoreEvent e)
+                {
+                    if (e.TableId != table)
+                        return false;
+
+                    var activeLocale = _store.GetActiveLocale();
+                    var chain = _policy.GetFallbackChain(activeLocale);
+
+                    for (var i = 0; i < chain.Count; i++)
+                    {
+                        if (chain[i] == e.Locale)
+                            return true;
+                    }
+
+                    return false;
+                }
+
                 var argsSub = args.Subscribe(a =>
                 {
                     latestArgs = a;
@@ -305,6 +401,22 @@ namespace Runtime.Localization
                     Emit();
                 });
 
+                // Important for lazy-loading: when a table is loaded/unloaded after subscription,
+                // re-emit so UI updates without requiring a locale change.
+                var storeEvents = _store.Events;
+                var storeSub = storeEvents == null
+                    ? Disposable.Empty
+                    : storeEvents.Subscribe(e =>
+                    {
+                        if (e.Type != LocalizationStoreEventType.TableLoaded && e.Type != LocalizationStoreEventType.TableUnloaded)
+                            return;
+
+                        if (!ShouldRefreshOnStoreEvent(e))
+                            return;
+
+                        Emit();
+                    });
+
                 Emit();
 
                 return Disposable.Create(() =>
@@ -312,6 +424,7 @@ namespace Runtime.Localization
                     Interlocked.Exchange(ref isDisposed, 1);
                     argsSub.Dispose();
                     localeSub.Dispose();
+                    storeSub.Dispose();
                 });
             });
         }
@@ -319,6 +432,8 @@ namespace Runtime.Localization
         public Observable<string> Observe(TextTableId table, TextKey key, IReadOnlyDictionary<string, object> args = null)
         {
             EnsureInitialized();
+
+            TrackTable(table);
 
             return Observable.Create<string>(observer =>
             {
@@ -335,7 +450,41 @@ namespace Runtime.Localization
                     observer.OnNext(Resolve(table, key, args));
                 });
 
-                return Disposable.Create(() => localeSub.Dispose());
+                var storeEvents = _store.Events;
+                var storeSub = storeEvents == null
+                    ? Disposable.Empty
+                    : storeEvents.Subscribe(e =>
+                    {
+                        if (e.Type != LocalizationStoreEventType.TableLoaded && e.Type != LocalizationStoreEventType.TableUnloaded)
+                            return;
+
+                        if (e.TableId != table)
+                            return;
+
+                        var activeLocale = _store.GetActiveLocale();
+                        var chain = _policy.GetFallbackChain(activeLocale);
+
+                        var isRelevantLocale = false;
+                        for (var i = 0; i < chain.Count; i++)
+                        {
+                            if (chain[i] == e.Locale)
+                            {
+                                isRelevantLocale = true;
+                                break;
+                            }
+                        }
+
+                        if (!isRelevantLocale)
+                            return;
+
+                        observer.OnNext(Resolve(table, key, args));
+                    });
+
+                return Disposable.Create(() =>
+                {
+                    localeSub.Dispose();
+                    storeSub.Dispose();
+                });
             });
         }
 
@@ -419,6 +568,59 @@ namespace Runtime.Localization
                 _busyCount = 0;
                 _isBusy.Value = false;
             }
+        }
+
+        private void TrackTable(TextTableId table)
+        {
+            if (string.IsNullOrWhiteSpace(table.Name))
+                return;
+
+            lock (_trackedTablesLock)
+            {
+                _trackedTables.Add(table);
+            }
+        }
+
+        private IReadOnlyList<TextTableId> BuildLocaleSwitchPreloadList()
+        {
+            var startupTables = _catalog.GetStartupTables();
+            var requiredTables = _catalog.GetRequiredTables();
+
+            TextTableId[] trackedSnapshot;
+            lock (_trackedTablesLock)
+            {
+                if (_trackedTables.Count == 0)
+                    return MergeTables(requiredTables, startupTables);
+
+                trackedSnapshot = new TextTableId[_trackedTables.Count];
+                _trackedTables.CopyTo(trackedSnapshot);
+            }
+
+            // Merge startup + tracked (deduplicated).
+            var merged = new List<TextTableId>();
+            var requiredAndStartup = MergeTables(requiredTables, startupTables);
+            for (var i = 0; i < requiredAndStartup.Count; i++)
+                merged.Add(requiredAndStartup[i]);
+
+            for (var i = 0; i < trackedSnapshot.Length; i++)
+            {
+                var table = trackedSnapshot[i];
+
+                var alreadyAdded = false;
+                for (var j = 0; j < merged.Count; j++)
+                {
+                    if (merged[j] == table)
+                    {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyAdded)
+                    merged.Add(table);
+            }
+
+            return merged;
         }
     }
 }

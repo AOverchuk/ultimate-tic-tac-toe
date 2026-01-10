@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using R3;
 
 namespace Runtime.Localization
@@ -18,5 +20,17 @@ namespace Runtime.Localization
             string key,
             IReadOnlyDictionary<string, object> args = null) =>
             service.Observe(new TextTableId(table), new TextKey(key), args);
+
+        public static UniTask PreloadCurrentLocaleAsync(
+            this ILocalizationService service,
+            TextTableId table,
+            CancellationToken cancellationToken) =>
+            service.PreloadAsync(service.CurrentLocale.CurrentValue, new[] { table }, cancellationToken);
+
+        public static UniTask PreloadCurrentLocaleAsync(
+            this ILocalizationService service,
+            IReadOnlyList<TextTableId> tables,
+            CancellationToken cancellationToken) =>
+            service.PreloadAsync(service.CurrentLocale.CurrentValue, tables, cancellationToken);
     }
 }

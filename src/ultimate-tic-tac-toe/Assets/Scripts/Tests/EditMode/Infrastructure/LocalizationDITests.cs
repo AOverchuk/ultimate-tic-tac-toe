@@ -58,6 +58,8 @@ namespace Tests.EditMode.Infrastructure
             var parserMock = Substitute.For<ILocalizationParser>();
             var storeMock = Substitute.For<ILocalizationStore>();
             var formatterMock = Substitute.For<ITextFormatter>();
+
+            catalogMock.GetRequiredTables().Returns(System.Array.Empty<TextTableId>());
             
             builder.RegisterInstance(policyMock).As<ILocalizationPolicy>();
             builder.RegisterInstance(storageMock).As<ILocaleStorage>();

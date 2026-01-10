@@ -7,6 +7,11 @@ insert_final_newline = false
 indent_style = space
 indent_size = 4
 
+# Unity note: rules like `resharper_applicable_kinds = unity_serialised_field` are Rider/ReSharper-only.
+# VS Code (C# Dev Kit/Roslyn) can't target [SerializeField] via EditorConfig naming rules, so it otherwise reports false positives.
+[Assets/**/*.cs]
+dotnet_diagnostic.IDE1006.severity = none
+
 # Microsoft .NET properties
 csharp_indent_braces = false
 csharp_indent_switch_labels = true
