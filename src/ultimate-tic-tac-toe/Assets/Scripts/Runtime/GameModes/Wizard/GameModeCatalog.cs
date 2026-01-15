@@ -32,6 +32,10 @@ namespace Runtime.GameModes.Wizard
                     throw new ArgumentException("Strategy has empty ModeId.", nameof(strategies));
                 if (strategy.Metadata == null)
                     throw new ArgumentException($"Strategy '{strategy.ModeId}' has null Metadata.", nameof(strategies));
+                if (!string.Equals(strategy.Metadata.Id, strategy.ModeId, StringComparison.Ordinal))
+                    throw new ArgumentException(
+                        $"Strategy '{strategy.ModeId}' has mismatched Metadata.Id: '{strategy.Metadata.Id}'.",
+                        nameof(strategies));
 
                 if (!dict.TryAdd(strategy.ModeId, strategy))
                     throw new ArgumentException($"Duplicate mode id in catalog: '{strategy.ModeId}'.", nameof(strategies));
