@@ -1,0 +1,14 @@
+namespace Runtime.GameModes.Wizard
+{
+    /// <summary>
+    /// High-level navigation intents produced by wizard view-models.
+    /// Processed by <see cref="IGameModeWizardCoordinator"/>.
+    /// </summary>
+    public enum WizardIntent
+    {
+        Continue = 0,
+        Back = 1,
+        Cancel = 2,
+        Start = 3,
+    }
+}
